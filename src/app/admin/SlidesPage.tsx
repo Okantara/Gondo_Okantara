@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Plus,
   Edit,
@@ -7,10 +7,12 @@ import {
   ChevronRight,
   Eye,
 } from "lucide-react";
+import { supabase } from "../../lib/supabase";
 
 interface Slide {
   id: number;
   imageUrl: string;
+  imagePath: string;
   title: string;
   subtitle: string;
   order: number;
@@ -18,23 +20,11 @@ interface Slide {
 }
 
 export function SlidesPage() {
-  const [slides, setSlides] = useState<Slide[]>([
-    {
-      id: 1,
-      imageUrl:
-        "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800",
-      title: "Diskon Besar-Besaran!",
-      subtitle: "Dapatkan diskon hingga 50% untuk semua produk elektronik",
-      order: 1,
-      isActive: true,
-    },
-  ]);
-
+  const [slides, setSlides] = useState<Slide[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSlide, setEditingSlide] = useState<Slide | null>(null);
   const [previewMode, setPreviewMode] = useState(false);
   const [currentPreviewIndex, setCurrentPreviewIndex] = useState(0);
-
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const [formData, setFormData] = useState({
@@ -43,75 +33,164 @@ export function SlidesPage() {
     isActive: true,
   });
 
+  const fetchSlides = async () => {
+    const { data, error } = await supabase
+      .from("slides")
+      .select("*")
+      .order("order", { ascending: true });
+
+    if (error) {
+      console.error("Gagal mengambil slide:", error);
+      return;
+    }
+
+    const mappedSlides: Slide[] = data.map((item) => ({
+      id: item.id,
+      imageUrl: item.image_url,
+      imagePath: item.image_path,
+      title: item.title,
+      subtitle: item.subtitle,
+      order: item.order,
+      isActive: item.is_active,
+    }));
+
+    setSlides(mappedSlides);
+  };
+
+  useEffect(() => {
+    fetchSlides();
+  }, []);
+
   const handleAdd = () => {
     setEditingSlide(null);
-
     setFormData({
       title: "",
       subtitle: "",
       isActive: true,
     });
-
     setSelectedFile(null);
     setIsModalOpen(true);
   };
 
   const handleEdit = (slide: Slide) => {
     setEditingSlide(slide);
-
     setFormData({
       title: slide.title,
       subtitle: slide.subtitle,
       isActive: slide.isActive,
     });
-
     setSelectedFile(null);
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id: number) => {
-    if (confirm("Apakah Anda yakin ingin menghapus slide ini?")) {
-      setSlides(slides.filter((s) => s.id !== id));
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     let imageUrl = editingSlide?.imageUrl || "";
+    let imagePath = editingSlide?.imagePath || "";
 
     if (selectedFile) {
-      imageUrl = URL.createObjectURL(selectedFile);
+      const fileExt = selectedFile.name.split(".").pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `slides/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("gondo-okantara")
+        .upload(filePath, selectedFile);
+
+      if (uploadError) {
+        console.error("Gagal upload:", uploadError);
+        alert("Gagal upload gambar");
+        return;
+      }
+
+      const { data } = supabase.storage.from("slides").getPublicUrl(filePath);
+
+      imageUrl = data.publicUrl;
+      imagePath = filePath;
     }
 
     if (editingSlide) {
-      setSlides(
-        slides.map((s) =>
-          s.id === editingSlide.id
-            ? {
-                ...editingSlide,
-                ...formData,
-                imageUrl,
-              }
-            : s,
-        ),
-      );
-    } else {
-      const newSlide: Slide = {
-        ...formData,
-        imageUrl,
-        id: Math.max(...slides.map((s) => s.id), 0) + 1,
-        order: slides.length + 1,
-      };
+      const { error } = await supabase
+        .from("slides")
+        .update({
+          title: formData.title,
+          subtitle: formData.subtitle,
+          image_url: imageUrl,
+          image_path: imagePath,
+          is_active: formData.isActive,
+        })
+        .eq("id", editingSlide.id);
 
-      setSlides([...slides, newSlide]);
+      if (error) {
+        console.error("Gagal update:", error);
+        alert("Gagal update slide");
+        return;
+      }
+    } else {
+      const { error } = await supabase.from("slides").insert({
+        title: formData.title,
+        subtitle: formData.subtitle,
+        image_url: imageUrl,
+        image_path: imagePath,
+        order: slides.length + 1,
+        is_active: formData.isActive,
+      });
+
+      if (error) {
+        console.error("Gagal insert:", error);
+        alert("Gagal tambah slide");
+        return;
+      }
     }
 
+    await fetchSlides();
     setIsModalOpen(false);
     setSelectedFile(null);
+    setEditingSlide(null);
   };
 
-  const moveSlide = (index: number, direction: "up" | "down") => {
+  const handleDelete = async (id: number) => {
+    if (!confirm("Apakah Anda yakin ingin menghapus slide ini?")) return;
+
+    const slide = slides.find((s) => s.id === id);
+
+    if (slide?.imagePath) {
+      await supabase.storage.from("slides").remove([slide.imagePath]);
+    }
+
+    const { error } = await supabase.from("slides").delete().eq("id", id);
+
+    if (error) {
+      console.error("Gagal hapus:", error);
+      alert("Gagal hapus slide");
+      return;
+    }
+
+    await fetchSlides();
+  };
+
+  const toggleActive = async (id: number) => {
+    const slide = slides.find((s) => s.id === id);
+    if (!slide) return;
+
+    const { error } = await supabase
+      .from("slides")
+      .update({
+        is_active: !slide.isActive,
+      })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Gagal ubah status:", error);
+      alert("Gagal ubah status");
+      return;
+    }
+
+    await fetchSlides();
+  };
+
+  const moveSlide = async (index: number, direction: "up" | "down") => {
     const newSlides = [...slides];
     const targetIndex = direction === "up" ? index - 1 : index + 1;
 
@@ -122,28 +201,38 @@ export function SlidesPage() {
       newSlides[index],
     ];
 
-    newSlides.forEach((slide, idx) => {
-      slide.order = idx + 1;
-    });
+    const updatedSlides = newSlides.map((slide, idx) => ({
+      ...slide,
+      order: idx + 1,
+    }));
 
-    setSlides(newSlides);
-  };
+    setSlides(updatedSlides);
 
-  const toggleActive = (id: number) => {
-    setSlides(
-      slides.map((s) => (s.id === id ? { ...s, isActive: !s.isActive } : s)),
-    );
+    for (const slide of updatedSlides) {
+      await supabase
+        .from("slides")
+        .update({
+          order: slide.order,
+        })
+        .eq("id", slide.id);
+    }
+
+    await fetchSlides();
   };
 
   const activeSlides = slides.filter((s) => s.isActive);
 
   const nextSlide = () => {
+    if (activeSlides.length === 0) return;
+
     setCurrentPreviewIndex((prev) =>
       prev === activeSlides.length - 1 ? 0 : prev + 1,
     );
   };
 
   const prevSlide = () => {
+    if (activeSlides.length === 0) return;
+
     setCurrentPreviewIndex((prev) =>
       prev === 0 ? activeSlides.length - 1 : prev - 1,
     );
@@ -151,7 +240,6 @@ export function SlidesPage() {
 
   return (
     <div className="p-4 sm:p-6">
-      {/* HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
           Image Slides
@@ -176,7 +264,6 @@ export function SlidesPage() {
         </div>
       </div>
 
-      {/* DESKTOP TABLE */}
       <div className="hidden md:block bg-white rounded-lg shadow overflow-x-auto">
         <table className="w-full min-w-200">
           <thead className="bg-gray-50 border-b">
@@ -261,7 +348,6 @@ export function SlidesPage() {
         </table>
       </div>
 
-      {/* MOBILE CARD */}
       <div className="md:hidden space-y-4">
         {slides.map((slide, index) => (
           <div
@@ -327,7 +413,6 @@ export function SlidesPage() {
         ))}
       </div>
 
-      {/* MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -347,10 +432,7 @@ export function SlidesPage() {
                     accept="image/*"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
-
-                      if (file) {
-                        setSelectedFile(file);
-                      }
+                      if (file) setSelectedFile(file);
                     }}
                     className="w-full border border-gray-300 rounded-lg p-2"
                     required={!editingSlide}
@@ -427,7 +509,11 @@ export function SlidesPage() {
                 <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
                   <button
                     type="button"
-                    onClick={() => setIsModalOpen(false)}
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      setEditingSlide(null);
+                      setSelectedFile(null);
+                    }}
                     className="px-4 py-3 border rounded-lg"
                   >
                     Batal
@@ -446,7 +532,6 @@ export function SlidesPage() {
         </div>
       )}
 
-      {/* PREVIEW */}
       {previewMode && activeSlides.length > 0 && (
         <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
           <button

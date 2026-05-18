@@ -10,7 +10,8 @@ import {
   X,
   LogOut,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 const navItems = [
   { path: "/admin", icon: LayoutDashboard, label: "Dashboard" },
@@ -18,71 +19,24 @@ const navItems = [
   { path: "/admin/Katalog", icon: Image, label: "Katalog Produk" },
   { path: "/admin/Galerry", icon: ShoppingBasket, label: "Varian Abon" },
   { path: "/admin/MitraPage", icon: Handshake, label: "Mitra Kerja" },
-  { path: "/admin/profile", icon: User, label: "Profil" },
+  { path: "/admin/profile", icon: User, label: "Profil Toko" },
 ];
 
 export function DashboardLayout() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { signOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const SESSION_TIMEOUT = 15 * 60 * 1000; // 15 menit
-
-  useEffect(() => {
-    const checkSession = () => {
-      const isAuthenticated = localStorage.getItem("isAuthenticated");
-      const loginTime = localStorage.getItem("loginTime");
-
-      if (!isAuthenticated || !loginTime) {
-        navigate("/admin/login", { replace: true });
-        return;
-      }
-
-      const now = Date.now();
-      const elapsed = now - parseInt(loginTime);
-
-      if (elapsed > SESSION_TIMEOUT) {
-        alert("Session Anda telah habis (15 menit idle).");
-
-        localStorage.removeItem("isAuthenticated");
-        localStorage.removeItem("loginTime");
-
-        navigate("/admin/login", { replace: true });
-      }
-    };
-
-    // cek saat pertama load
-    checkSession();
-
-    // cek tiap 1 menit
-    const interval = setInterval(checkSession, 60 * 1000);
-
-    return () => clearInterval(interval);
-  }, [navigate]);
-
-  // ✅ AUTO REFRESH SESSION (IDLE DETECTION)
-  useEffect(() => {
-    const refreshSession = () => {
-      localStorage.setItem("loginTime", Date.now().toString());
-    };
-
-    window.addEventListener("click", refreshSession);
-    window.addEventListener("keypress", refreshSession);
-    window.addEventListener("mousemove", refreshSession);
-
-    return () => {
-      window.removeEventListener("click", refreshSession);
-      window.removeEventListener("keypress", refreshSession);
-      window.removeEventListener("mousemove", refreshSession);
-    };
-  }, []);
-
-  const handleLogout = () => {
+  const handleLogout = async () => {
     if (confirm("Apakah Anda yakin ingin logout?")) {
-      localStorage.removeItem("isAuthenticated");
-      localStorage.removeItem("loginTime");
-
-      navigate("/admin/login", { replace: true });
+      try {
+        await signOut();
+        navigate("/admin/login", { replace: true });
+      } catch (error) {
+        console.error("Logout error:", error);
+        alert("Gagal logout");
+      }
     }
   };
 
