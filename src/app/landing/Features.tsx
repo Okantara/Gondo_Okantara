@@ -3,7 +3,7 @@ import { Leaf, ShieldCheck, Award, MapPin } from "lucide-react";
 const features = [
   {
     icon: Leaf,
-    title: "Kaya Protein",
+    title: "Bergizi",
     description:
       "Sumber protein hewani berkualitas tinggi untuk nutrisi keluarga",
   },
@@ -15,12 +15,12 @@ const features = [
   },
   {
     icon: Award,
-    title: "Tanpa Pengawet Berbahaya",
+    title: "Tanpa Pengawet",
     description: "100% alami tanpa bahan kimia berbahaya untuk kesehatan",
   },
   {
     icon: MapPin,
-    title: "Khas Tulungagung",
+    title: "Tradisional Indonesia",
     description: "Produk asli Jawa Timur dengan cita rasa tradisional autentik",
   },
 ];

@@ -105,12 +105,6 @@ export function Hero() {
       {/* Content */}
       <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
         <div className="max-w-2xl">
-          <div className="mb-6">
-            <span className="inline-block bg-[#E31E24] text-white px-4 py-2 rounded-full text-sm">
-              Produk Lokal Berkualitas
-            </span>
-          </div>
-
           <h1 className="text-5xl md:text-6xl text-white mb-4">
             {activeSlide.title}
           </h1>
@@ -119,26 +113,7 @@ export function Hero() {
             {activeSlide.subtitle}
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4">
-            <button
-              onClick={() => {
-                const element = document.getElementById("katalog");
-                element?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="w-fit min-w-[180px] flex-shrink-0 bg-white text-[#E31E24] px-8 py-4 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              Lihat Produk
-            </button>
-
-            <a
-              href="https://wa.me/6285630300012"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-fit min-w-[180px] flex-shrink-0 bg-[#E31E24] text-white px-8 py-4 rounded-lg hover:bg-[#C11A1F] transition-colors text-center"
-            >
-              Pesan Sekarang
-            </a>
-          </div>
+          <div className="flex flex-col sm:flex-row gap-4"></div>
         </div>
       </div>
 

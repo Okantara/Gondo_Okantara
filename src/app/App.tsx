@@ -15,6 +15,7 @@ import { KatalogPage } from "./admin/KatalogPage";
 import { ProductsPage } from "./admin/ProductsPage";
 import { ProfilePage } from "./admin/ProfilePage";
 import { MitraPage } from "./admin/MitraPage";
+import { MitraManagementPage } from "./admin/MitraManagementPage";
 import { SlidesPage } from "./admin/SlidesPage";
 
 // LAYOUT
@@ -53,6 +54,10 @@ export default function App() {
               <Route path="profile" element={<ProfilePage />} />
               <Route path="MitraPage" element={<MitraPage />} />
               <Route path="slides" element={<SlidesPage />} />
+              <Route
+                path="mitra-management"
+                element={<MitraManagementPage />}
+              />
             </Route>
           </Route>
         </Routes>

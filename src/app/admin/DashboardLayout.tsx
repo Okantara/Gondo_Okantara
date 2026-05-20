@@ -18,7 +18,8 @@ const navItems = [
   { path: "/admin/slides", icon: ImagePlay, label: "Image Slides" },
   { path: "/admin/Katalog", icon: Image, label: "Katalog Produk" },
   { path: "/admin/Galerry", icon: ShoppingBasket, label: "Varian Abon" },
-  { path: "/admin/MitraPage", icon: Handshake, label: "Mitra Kerja" },
+  { path: "/admin/MitraPage", icon: Handshake, label: "Data Mitra" },
+  { path: "/admin/mitra-management", icon: Handshake, label: "Kelola Mitra" },
   { path: "/admin/profile", icon: User, label: "Profil Toko" },
 ];
 

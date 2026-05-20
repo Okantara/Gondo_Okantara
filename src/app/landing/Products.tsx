@@ -77,16 +77,6 @@ export function Products() {
                 <p className="text-gray-600 mb-6 line-clamp-3 min-h-[1px]">
                   {product.deskripsi}
                 </p>
-
-                <a
-                  href="https://wa.me/6285630300012"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-auto flex items-center justify-center gap-2 w-full bg-[#E31E24] text-white px-6 py-3 rounded-lg hover:bg-[#C11A1F] transition-colors"
-                >
-                  <ShoppingBag size={20} />
-                  Pesan Sekarang
-                </a>
               </div>
             </div>
           ))}

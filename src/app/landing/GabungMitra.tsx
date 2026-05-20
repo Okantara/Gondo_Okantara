@@ -104,12 +104,8 @@ export function FormKemitraan() {
     >
       <div className="w-full max-w-xl bg-white shadow-lg rounded-2xl p-8">
         <h2 className="text-3xl font-bold text-gray-800 text-center">
-          Form Pendaftaran Kemitraan
+          Data Order
         </h2>
-
-        <p className="text-gray-500 text-center mb-6">
-          Lengkapi Data Diri Anda Dengan Benar
-        </p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {formFields.map((field, index) => (
@@ -158,7 +154,7 @@ export function FormKemitraan() {
             disabled={loading}
             className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 rounded-xl transition duration-300"
           >
-            {loading ? "Mengirim..." : "Daftar Sekarang"}
+            {loading ? "Mengirim..." : "Bermitra"}
           </button>
         </form>
       </div>
