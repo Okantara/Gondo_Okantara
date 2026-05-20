@@ -1,9 +1,19 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "../../lib/supabase";
+import { getImageUrl } from "../../lib/imageUtils";
+
+interface Slide {
+  id: number;
+  image_url: string;
+  title: string;
+  subtitle: string;
+  order: number;
+  is_active: boolean;
+}
 
 export function Hero() {
-  const [slides, setSlides] = useState<any[]>([]);
+  const [slides, setSlides] = useState<Slide[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
 
   // ambil data slides dari database
@@ -53,15 +63,6 @@ export function Hero() {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
-  // generate public url dari storage
-  const getImageUrl = (path: string) => {
-    const { data } = supabase.storage
-      .from("gondo-okantara")
-      .getPublicUrl(path);
-
-    return data.publicUrl;
-  };
-
   // loading
   if (slides.length === 0) {
     return (
@@ -74,19 +75,11 @@ export function Hero() {
   const activeSlide = slides[currentSlide];
 
   return (
-    <section
-      id="beranda"
-      className="relative h-150 md:h-175 overflow-hidden"
-    >
+    <section id="beranda" className="relative h-150 md:h-175 overflow-hidden">
       {/* Background Slides */}
       <div className="absolute inset-0">
         {slides.map((slide, index) => {
-          // DEBUG
-          console.log("PATH:", slide.image_url);
-
           const imageUrl = getImageUrl(slide.image_url);
-
-          console.log("FINAL URL:", imageUrl);
 
           return (
             <div
@@ -132,7 +125,7 @@ export function Hero() {
                 const element = document.getElementById("katalog");
                 element?.scrollIntoView({ behavior: "smooth" });
               }}
-              className="bg-white text-[#E31E24] px-8 py-4 rounded-lg hover:bg-gray-100 transition-colors"
+              className="w-fit min-w-[180px] flex-shrink-0 bg-white text-[#E31E24] px-8 py-4 rounded-lg hover:bg-gray-100 transition-colors"
             >
               Lihat Produk
             </button>
@@ -141,7 +134,7 @@ export function Hero() {
               href="https://wa.me/6285630300012"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-[#E31E24] text-white px-8 py-4 rounded-lg hover:bg-[#C11A1F] transition-colors text-center"
+              className="w-fit min-w-[180px] flex-shrink-0 bg-[#E31E24] text-white px-8 py-4 rounded-lg hover:bg-[#C11A1F] transition-colors text-center"
             >
               Pesan Sekarang
             </a>

@@ -1,61 +1,52 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, X, Phone, Mail, MapPin, User, Search } from "lucide-react";
+import { supabase } from "../../lib/supabase";
 
 interface Partner {
-  id: string;
-  fullName: string;
-  phone: string;
+  id: number;
+  nama_lengkap: string;
+  whatsapp: string;
   email: string;
-  address: string;
-  joinDate: string;
+  alamat: string;
+  created_at: string;
 }
 
 export function MitraPage() {
-  const [partners] = useState<Partner[]>([
-    {
-      id: "MIT-001",
-      fullName: "Budi Santoso",
-      phone: "081234567890",
-      email: "budi@email.com",
-      address: "Jl. Sudirman No. 123, Jakarta Selatan",
-      joinDate: "2026-05-12",
-    },
-    {
-      id: "MIT-002",
-      fullName: "Siti Aminah",
-      phone: "081298765432",
-      email: "siti@email.com",
-      address: "Surabaya, Jawa Timur",
-      joinDate: "2026-05-10",
-    },
-    {
-      id: "MIT-003",
-      fullName: "Andi Pratama",
-      phone: "081255544433",
-      email: "andi@email.com",
-      address: "Bandung, Jawa Barat",
-      joinDate: "2026-05-08",
-    },
-  ]);
-
+  const [partners, setPartners] = useState<Partner[]>([]);
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // FILTER SEARCH
+  useEffect(() => {
+    getPartners();
+  }, []);
+
+  async function getPartners() {
+    const { data, error } = await supabase
+      .from("kontak")
+      .select("*")
+      .order("id", { ascending: false });
+
+    if (error) {
+      console.error("Gagal mengambil data mitra:", error);
+      return;
+    }
+
+    setPartners(data || []);
+  }
+
   const filteredPartners = partners.filter((p) => {
     const q = searchQuery.toLowerCase();
 
     return (
-      p.fullName.toLowerCase().includes(q) ||
-      p.phone.includes(q) ||
+      p.nama_lengkap.toLowerCase().includes(q) ||
+      p.whatsapp.includes(q) ||
       p.email.toLowerCase().includes(q) ||
-      p.address.toLowerCase().includes(q)
+      p.alamat.toLowerCase().includes(q)
     );
   });
 
   return (
     <div className="p-4 sm:p-6 space-y-6 bg-gray-50 min-h-screen">
-      {/* HEADER */}
       <div>
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
           Data Mitra
@@ -65,7 +56,6 @@ export function MitraPage() {
         </p>
       </div>
 
-      {/* SEARCH */}
       <div className="relative">
         <Search className="absolute left-3 top-3 text-gray-400" size={18} />
 
@@ -78,7 +68,6 @@ export function MitraPage() {
         />
       </div>
 
-      {/* GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredPartners.map((p) => (
           <div
@@ -87,13 +76,13 @@ export function MitraPage() {
           >
             <div className="flex items-center gap-2">
               <User className="text-blue-600" size={18} />
-              <h2 className="font-semibold text-gray-900">{p.fullName}</h2>
+              <h2 className="font-semibold text-gray-900">{p.nama_lengkap}</h2>
             </div>
 
             <div className="text-sm text-gray-600 space-y-2">
               <div className="flex items-center gap-2">
                 <Phone size={14} />
-                {p.phone}
+                {p.whatsapp}
               </div>
 
               <div className="flex items-center gap-2">
@@ -103,12 +92,14 @@ export function MitraPage() {
 
               <div className="flex items-start gap-2">
                 <MapPin size={14} className="mt-1" />
-                <span>{p.address}</span>
+                <span>{p.alamat}</span>
               </div>
             </div>
 
             <div className="flex justify-between items-center pt-2">
-              <span className="text-xs text-gray-400">Join: {p.joinDate}</span>
+              <span className="text-xs text-gray-400">
+                Join: {new Date(p.created_at).toLocaleDateString("id-ID")}
+              </span>
 
               <button
                 onClick={() => setSelectedPartner(p)}
@@ -121,7 +112,10 @@ export function MitraPage() {
         ))}
       </div>
 
-      {/* MODAL */}
+      {filteredPartners.length === 0 && (
+        <p className="text-center text-gray-500 py-10">Belum ada data mitra.</p>
+      )}
+
       {selectedPartner && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white w-full max-w-lg rounded-2xl p-5 space-y-4">
@@ -135,12 +129,12 @@ export function MitraPage() {
             <div className="space-y-3 text-sm text-gray-700">
               <p>
                 <span className="font-medium">Nama:</span>{" "}
-                {selectedPartner.fullName}
+                {selectedPartner.nama_lengkap}
               </p>
 
               <p>
                 <span className="font-medium">WhatsApp:</span>{" "}
-                {selectedPartner.phone}
+                {selectedPartner.whatsapp}
               </p>
 
               <p>
@@ -150,12 +144,14 @@ export function MitraPage() {
 
               <p>
                 <span className="font-medium">Alamat:</span>{" "}
-                {selectedPartner.address}
+                {selectedPartner.alamat}
               </p>
 
               <p>
                 <span className="font-medium">Tanggal Join:</span>{" "}
-                {selectedPartner.joinDate}
+                {new Date(selectedPartner.created_at).toLocaleDateString(
+                  "id-ID",
+                )}
               </p>
             </div>
           </div>

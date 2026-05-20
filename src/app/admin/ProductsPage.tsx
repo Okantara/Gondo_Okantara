@@ -1,103 +1,149 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Edit, Trash2 } from "lucide-react";
+import { supabase } from "../../lib/supabase";
 
 interface Product {
   id: number;
-  image: string;
-  description: string;
+  src: string;
+  alt: string;
 }
 
 export function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>([
-    {
-      id: 1,
-      image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400",
-      description: "Sepatu running berkualitas tinggi",
-    },
-  ]);
-
+  const [products, setProducts] = useState<Product[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const [formData, setFormData] = useState<{
     image: File | null;
-    description: string;
+    alt: string;
   }>({
     image: null,
-    description: "",
+    alt: "",
   });
 
-  // ADD
+  useEffect(() => {
+    getProducts();
+  }, []);
+
+  async function getProducts() {
+    const { data, error } = await supabase
+      .from("gallery")
+      .select("*")
+      .order("id", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching products:", error);
+      alert(error.message);
+      return;
+    }
+
+    setProducts(data || []);
+  }
+
+  // ✅ FIXED UPLOAD (bucket benar: gondo-okantara)
+  const uploadImage = async (file: File) => {
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${Date.now()}.${fileExt}`;
+    const filePath = `gallery/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("gondo-okantara")
+      .upload(filePath, file);
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data } = supabase.storage
+      .from("gondo-okantara")
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  };
+
   const handleAdd = () => {
     setEditingProduct(null);
-    setFormData({ image: null, description: "" });
+    setFormData({ image: null, alt: "" });
     setIsModalOpen(true);
   };
 
-  // EDIT
   const handleEdit = (product: Product) => {
     setEditingProduct(product);
     setFormData({
-      image: null, // file baru kalau mau ganti
-      description: product.description,
+      image: null,
+      alt: product.alt,
     });
     setIsModalOpen(true);
   };
 
-  // DELETE
-  const handleDelete = (id: number) => {
-    if (confirm("Hapus produk ini?")) {
-      setProducts(products.filter((p) => p.id !== id));
+  const handleDelete = async (id: number) => {
+    if (!confirm("Hapus produk?")) return;
+
+    const { error } = await supabase.from("gallery").delete().eq("id", id);
+
+    if (error) {
+      console.error(error);
+      alert(error.message);
+      return;
     }
+
+    setProducts(products.filter((p) => p.id !== id));
   };
 
-  // FILE CHANGE
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setFormData({ ...formData, image: file });
+    setFormData((prev) => ({
+      ...prev,
+      image: file,
+    }));
   };
 
-  // SUBMIT
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    let imageUrl = "";
+    try {
+      let imageUrl = editingProduct?.src || "";
 
-    // kalau upload baru
-    if (formData.image) {
-      imageUrl = URL.createObjectURL(formData.image);
+      if (formData.image) {
+        imageUrl = await uploadImage(formData.image);
+      }
+
+      if (!imageUrl && !editingProduct) {
+        alert("Gambar wajib diupload");
+        return;
+      }
+
+      if (editingProduct) {
+        const { error } = await supabase
+          .from("gallery")
+          .update({
+            src: imageUrl,
+            alt: formData.alt,
+          })
+          .eq("id", editingProduct.id);
+
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("gallery").insert({
+          src: imageUrl,
+          alt: formData.alt,
+        });
+
+        if (error) throw error;
+      }
+
+      setIsModalOpen(false);
+      getProducts();
+    } catch (error) {
+      console.error("Gagal simpan:", error);
+      alert(error instanceof Error ? error.message : "Unknown error");
     }
-
-    if (editingProduct) {
-      setProducts(
-        products.map((p) =>
-          p.id === editingProduct.id
-            ? {
-                ...p,
-                description: formData.description,
-                image: imageUrl || p.image,
-              }
-            : p,
-        ),
-      );
-    } else {
-      const newProduct: Product = {
-        id: Math.max(...products.map((p) => p.id), 0) + 1,
-        image: imageUrl,
-        description: formData.description,
-      };
-
-      setProducts([newProduct, ...products]);
-    }
-
-    setIsModalOpen(false);
   };
 
   return (
     <div className="p-4 sm:p-6 space-y-6 bg-gray-50 min-h-screen">
-      {/* HEADER */}
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold">Katalog Produk</h1>
 
@@ -110,19 +156,20 @@ export function ProductsPage() {
         </button>
       </div>
 
-      {/* GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {products.map((product) => (
           <div
             key={product.id}
             className="bg-white rounded-2xl shadow-sm overflow-hidden"
           >
-            <img src={product.image} className="w-full h-44 object-cover" />
+            <img
+              src={product.src}
+              alt={product.alt}
+              className="w-full h-44 object-cover"
+            />
 
             <div className="p-3 space-y-3">
-              <p className="text-sm text-gray-700 min-h-10">
-                {product.description}
-              </p>
+              <p className="text-sm text-gray-700 min-h-10">{product.alt}</p>
 
               <div className="flex items-center justify-between">
                 <button
@@ -144,7 +191,6 @@ export function ProductsPage() {
         ))}
       </div>
 
-      {/* MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
           <div className="bg-white w-full max-w-md p-5 rounded-2xl space-y-4">
@@ -153,23 +199,22 @@ export function ProductsPage() {
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-3">
-              {/* FILE UPLOAD */}
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
                 className="w-full border p-3 rounded-xl"
+                required={!editingProduct}
               />
 
-              {/* DESCRIPTION */}
               <textarea
-                placeholder="Deskripsi"
-                value={formData.description}
+                placeholder="Keterangan gambar"
+                value={formData.alt}
                 onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    description: e.target.value,
-                  })
+                  setFormData((prev) => ({
+                    ...prev,
+                    alt: e.target.value,
+                  }))
                 }
                 className="w-full border p-3 rounded-xl"
                 rows={4}

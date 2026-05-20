@@ -8,15 +8,15 @@ import {
   Eye,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
+import { getImageUrl } from "../../lib/imageUtils";
 
 interface Slide {
   id: number;
-  imageUrl: string;
-  imagePath: string;
+  image_url: string;
   title: string;
   subtitle: string;
   order: number;
-  isActive: boolean;
+  is_active: boolean;
 }
 
 export function SlidesPage() {
@@ -30,7 +30,7 @@ export function SlidesPage() {
   const [formData, setFormData] = useState({
     title: "",
     subtitle: "",
-    isActive: true,
+    is_active: true,
   });
 
   const fetchSlides = async () => {
@@ -44,14 +44,13 @@ export function SlidesPage() {
       return;
     }
 
-    const mappedSlides: Slide[] = data.map((item) => ({
+    const mappedSlides: Slide[] = data.map((item: any) => ({
       id: item.id,
-      imageUrl: item.image_url,
-      imagePath: item.image_path,
+      image_url: item.image_url,
       title: item.title,
       subtitle: item.subtitle,
       order: item.order,
-      isActive: item.is_active,
+      is_active: item.is_active,
     }));
 
     setSlides(mappedSlides);
@@ -66,7 +65,7 @@ export function SlidesPage() {
     setFormData({
       title: "",
       subtitle: "",
-      isActive: true,
+      is_active: true,
     });
     setSelectedFile(null);
     setIsModalOpen(true);
@@ -77,7 +76,7 @@ export function SlidesPage() {
     setFormData({
       title: slide.title,
       subtitle: slide.subtitle,
-      isActive: slide.isActive,
+      is_active: slide.is_active,
     });
     setSelectedFile(null);
     setIsModalOpen(true);
@@ -86,8 +85,7 @@ export function SlidesPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    let imageUrl = editingSlide?.imageUrl || "";
-    let imagePath = editingSlide?.imagePath || "";
+    let imageUrl = editingSlide?.image_url || "";
 
     if (selectedFile) {
       const fileExt = selectedFile.name.split(".").pop();
@@ -104,10 +102,7 @@ export function SlidesPage() {
         return;
       }
 
-      const { data } = supabase.storage.from("slides").getPublicUrl(filePath);
-
-      imageUrl = data.publicUrl;
-      imagePath = filePath;
+      imageUrl = filePath;
     }
 
     if (editingSlide) {
@@ -117,8 +112,7 @@ export function SlidesPage() {
           title: formData.title,
           subtitle: formData.subtitle,
           image_url: imageUrl,
-          image_path: imagePath,
-          is_active: formData.isActive,
+          is_active: formData.is_active,
         })
         .eq("id", editingSlide.id);
 
@@ -132,9 +126,8 @@ export function SlidesPage() {
         title: formData.title,
         subtitle: formData.subtitle,
         image_url: imageUrl,
-        image_path: imagePath,
         order: slides.length + 1,
-        is_active: formData.isActive,
+        is_active: formData.is_active,
       });
 
       if (error) {
@@ -155,8 +148,8 @@ export function SlidesPage() {
 
     const slide = slides.find((s) => s.id === id);
 
-    if (slide?.imagePath) {
-      await supabase.storage.from("slides").remove([slide.imagePath]);
+    if (slide?.image_url) {
+      await supabase.storage.from("gondo-okantara").remove([slide.image_url]);
     }
 
     const { error } = await supabase.from("slides").delete().eq("id", id);
@@ -177,7 +170,7 @@ export function SlidesPage() {
     const { error } = await supabase
       .from("slides")
       .update({
-        is_active: !slide.isActive,
+        is_active: !slide.is_active,
       })
       .eq("id", id);
 
@@ -220,7 +213,7 @@ export function SlidesPage() {
     await fetchSlides();
   };
 
-  const activeSlides = slides.filter((s) => s.isActive);
+  const activeSlides = slides.filter((s) => s.is_active);
 
   const nextSlide = () => {
     if (activeSlides.length === 0) return;
@@ -303,7 +296,7 @@ export function SlidesPage() {
 
                 <td className="px-6 py-4">
                   <img
-                    src={slide.imageUrl}
+                    src={getImageUrl(slide.image_url)}
                     alt={slide.title}
                     className="w-32 h-20 object-cover rounded-lg"
                   />
@@ -318,12 +311,12 @@ export function SlidesPage() {
                   <button
                     onClick={() => toggleActive(slide.id)}
                     className={`px-3 py-1 rounded-full sm:text-sm ${
-                      slide.isActive
+                      slide.is_active
                         ? "bg-green-100 text-green-700"
                         : "bg-gray-100 text-gray-600"
                     }`}
                   >
-                    {slide.isActive ? "Aktif" : "Nonaktif"}
+                    {slide.is_active ? "Aktif" : "Nonaktif"}
                   </button>
                 </td>
 
@@ -355,7 +348,7 @@ export function SlidesPage() {
             className="bg-white rounded-xl shadow p-4 space-y-4"
           >
             <img
-              src={slide.imageUrl}
+              src={getImageUrl(slide.image_url)}
               alt={slide.title}
               className="w-full h-44 object-cover rounded-lg"
             />
@@ -369,12 +362,12 @@ export function SlidesPage() {
               <button
                 onClick={() => toggleActive(slide.id)}
                 className={`px-3 py-1 rounded-full text-sm ${
-                  slide.isActive
+                  slide.is_active
                     ? "bg-green-100 text-green-700"
                     : "bg-gray-100 text-gray-600"
                 }`}
               >
-                {slide.isActive ? "Aktif" : "Nonaktif"}
+                {slide.is_active ? "Aktif" : "Nonaktif"}
               </button>
 
               <div className="flex items-center gap-2">
@@ -449,7 +442,7 @@ export function SlidesPage() {
 
                 {!selectedFile && editingSlide && (
                   <img
-                    src={editingSlide.imageUrl}
+                    src={getImageUrl(editingSlide.image_url)}
                     alt="Preview"
                     className="w-full h-52 object-cover rounded-lg"
                   />
@@ -494,11 +487,11 @@ export function SlidesPage() {
                 <div className="flex items-center gap-2">
                   <input
                     type="checkbox"
-                    checked={formData.isActive}
+                    checked={formData.is_active}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        isActive: e.target.checked,
+                        is_active: e.target.checked,
                       })
                     }
                   />
@@ -557,7 +550,7 @@ export function SlidesPage() {
 
           <div className="relative w-250 h-250">
             <img
-              src={activeSlides[currentPreviewIndex].imageUrl}
+              src={getImageUrl(activeSlides[currentPreviewIndex].image_url)}
               alt={activeSlides[currentPreviewIndex].title}
               className="w-full h-full object-cover"
             />

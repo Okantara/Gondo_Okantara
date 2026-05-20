@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "../../lib/supabase";
 import { Save, Phone, Mail, MapPin } from "lucide-react";
 
 interface ProfileData {
+  id?: string;
   businessName: string;
   whatsapp: string;
   email: string;
@@ -16,32 +18,96 @@ interface ProfileData {
   };
 }
 
-export function ProfilePage() {
-  const [profileData, setProfileData] = useState<ProfileData>({
-    businessName: "Toko Elektronik Jakarta",
-    whatsapp: "+62 812-3456-7890",
-    email: "info@tokoelektronik.com",
-    address: "Jl. Sudirman No. 123",
-    city: "Jakarta Selatan",
-    province: "DKI Jakarta",
-    postalCode: "12190",
-    description:
-      "Toko elektronik terpercaya dengan produk original dan harga terjangkau. Melayani pengiriman ke seluruh Indonesia.",
-    socialMedia: {
-      facebook: "https://facebook.com/tokoelektronik",
-      instagram: "@tokoelektronik",
-    },
-  });
+const emptyProfile: ProfileData = {
+  businessName: "",
+  whatsapp: "",
+  email: "",
+  address: "",
+  city: "",
+  province: "",
+  postalCode: "",
+  description: "",
+  socialMedia: {
+    facebook: "",
+    instagram: "",
+  },
+};
 
+export function ProfilePage() {
+  const [profileData, setProfileData] = useState<ProfileData>(emptyProfile);
+  const [editData, setEditData] = useState<ProfileData>(emptyProfile);
   const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState<ProfileData>(profileData);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setLoading(true);
+
+      const { data, error } = await supabase
+        .from("profile_data")
+        .select("*")
+        .limit(1)
+        .single();
+
+      if (error) {
+        console.error(error);
+        setLoading(false);
+        return;
+      }
+
+      const mappedData: ProfileData = {
+        id: data.id,
+        businessName: data.business_name || "",
+        whatsapp: data.whatsapp || "",
+        email: data.email || "",
+        address: data.address || "",
+        city: data.city || "",
+        province: data.province || "",
+        postalCode: data.postal_code || "",
+        description: data.description || "",
+        socialMedia: {
+          facebook: data.facebook || "",
+          instagram: data.instagram || "",
+        },
+      };
+
+      setProfileData(mappedData);
+      setEditData(mappedData);
+      setLoading(false);
+    };
+
+    fetchProfile();
+  }, []);
 
   const handleEdit = () => {
     setEditData(profileData);
     setIsEditing(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (!editData.id) return;
+
+    const { error } = await supabase
+      .from("profile_data")
+      .update({
+        business_name: editData.businessName,
+        whatsapp: editData.whatsapp,
+        email: editData.email,
+        address: editData.address,
+        city: editData.city,
+        province: editData.province,
+        postal_code: editData.postalCode,
+        description: editData.description,
+        facebook: editData.socialMedia.facebook,
+        instagram: editData.socialMedia.instagram,
+      })
+      .eq("id", editData.id);
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
     setProfileData(editData);
     setIsEditing(false);
   };
@@ -51,10 +117,15 @@ export function ProfilePage() {
     setIsEditing(false);
   };
 
+  if (loading) {
+    return <p className="p-6">Loading...</p>;
+  }
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Profil Toko</h1>
+
         {!isEditing && (
           <button
             onClick={handleEdit}
@@ -71,11 +142,13 @@ export function ProfilePage() {
             <h2 className="text-xl font-bold text-gray-900 mb-4">
               Informasi Bisnis
             </h2>
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Nama Bisnis
                 </label>
+
                 {isEditing ? (
                   <input
                     type="text"
@@ -89,10 +162,12 @@ export function ProfilePage() {
                   <p className="text-gray-900">{profileData.businessName}</p>
                 )}
               </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Deskripsi
                 </label>
+
                 {isEditing ? (
                   <textarea
                     value={editData.description}
@@ -113,12 +188,14 @@ export function ProfilePage() {
             <h2 className="text-xl font-bold text-gray-900 mb-4">
               Informasi Kontak
             </h2>
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   <Phone className="inline mr-2" size={16} />
                   WhatsApp
                 </label>
+
                 {isEditing ? (
                   <input
                     type="text"
@@ -132,11 +209,13 @@ export function ProfilePage() {
                   <p className="text-gray-900">{profileData.whatsapp}</p>
                 )}
               </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   <Mail className="inline mr-2" size={16} />
                   Email
                 </label>
+
                 {isEditing ? (
                   <input
                     type="email"
@@ -158,11 +237,13 @@ export function ProfilePage() {
               <MapPin className="inline mr-2" size={20} />
               Alamat
             </h2>
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Alamat Lengkap
                 </label>
+
                 {isEditing ? (
                   <input
                     type="text"
@@ -176,11 +257,13 @@ export function ProfilePage() {
                   <p className="text-gray-900">{profileData.address}</p>
                 )}
               </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Kota
                   </label>
+
                   {isEditing ? (
                     <input
                       type="text"
@@ -194,10 +277,12 @@ export function ProfilePage() {
                     <p className="text-gray-900">{profileData.city}</p>
                   )}
                 </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Provinsi
                   </label>
+
                   {isEditing ? (
                     <input
                       type="text"
@@ -212,10 +297,12 @@ export function ProfilePage() {
                   )}
                 </div>
               </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Kode Pos
                 </label>
+
                 {isEditing ? (
                   <input
                     type="text"
@@ -238,11 +325,13 @@ export function ProfilePage() {
             <h2 className="text-xl font-bold text-gray-900 mb-4">
               Media Sosial
             </h2>
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Facebook
                 </label>
+
                 {isEditing ? (
                   <input
                     type="text"
@@ -264,10 +353,12 @@ export function ProfilePage() {
                   </p>
                 )}
               </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Instagram
                 </label>
+
                 {isEditing ? (
                   <input
                     type="text"
@@ -301,6 +392,7 @@ export function ProfilePage() {
                 <Save size={20} />
                 Simpan Perubahan
               </button>
+
               <button
                 onClick={handleCancel}
                 className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
