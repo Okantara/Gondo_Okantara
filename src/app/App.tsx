@@ -7,6 +7,7 @@ import { Products } from "./landing/Products";
 import { Gallery } from "./landing/Gallery";
 import { Marketplace } from "./landing/Marketplace";
 import { FormKemitraan } from "./landing/GabungMitra";
+import { Order } from "./landing/Order";
 
 // ADMIN
 import { LoginPage } from "./admin/LoginPage";
@@ -14,8 +15,9 @@ import { DashboardHome } from "./admin/DashboardHome";
 import { KatalogPage } from "./admin/KatalogPage";
 import { ProductsPage } from "./admin/ProductsPage";
 import { ProfilePage } from "./admin/ProfilePage";
-import { MitraPage } from "./admin/MitraPage";
+import { KeunggulanProduk } from "./admin/Keunggulanproduk";
 import { MitraManagementPage } from "./admin/MitraManagementPage";
+import { MitraPage } from "./admin/MitraPage";
 import { SlidesPage } from "./admin/SlidesPage";
 
 // LAYOUT
@@ -40,6 +42,7 @@ export default function App() {
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/mitra-kerja" element={<Marketplace />} />
             <Route path="/gabung-mitra" element={<FormKemitraan />} />
+            <Route path="/Kasir" element={<Order />} />
           </Route>
 
           {/* ================= LOGIN ================= */}
@@ -52,8 +55,9 @@ export default function App() {
               <Route path="Galerry" element={<ProductsPage />} />
               <Route path="Katalog" element={<KatalogPage />} />
               <Route path="profile" element={<ProfilePage />} />
-              <Route path="MitraPage" element={<MitraPage />} />
+              <Route path="keunggulan-produk" element={<KeunggulanProduk />} />
               <Route path="slides" element={<SlidesPage />} />
+              <Route path="MitraPage" element={<MitraPage />} />
               <Route
                 path="mitra-management"
                 element={<MitraManagementPage />}

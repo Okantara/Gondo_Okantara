@@ -6,6 +6,7 @@ import {
   User,
   ImagePlay,
   Handshake,
+  Feather,
   Menu,
   X,
   LogOut,
@@ -21,6 +22,11 @@ const navItems = [
   { path: "/admin/MitraPage", icon: Handshake, label: "Data Mitra" },
   { path: "/admin/mitra-management", icon: Handshake, label: "Kelola Mitra" },
   { path: "/admin/profile", icon: User, label: "Profil Toko" },
+  {
+    path: "/admin/keunggulan-produk",
+    icon: Feather,
+    label: "Keunggulan Produk",
+  },
 ];
 
 export function DashboardLayout() {

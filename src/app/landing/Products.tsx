@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
-import { ShoppingBag } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
 interface Product {
@@ -39,12 +38,10 @@ export function Products() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl text-gray-900 mb-4">
-            Katalog Produk
+          <h2 className="text-4xl md:text-5xl text-gray-900 mb-4 font-berkshire">
+            Produk
           </h2>
-          <p className="text-xl text-gray-600">
-            Pilihan lengkap abon dan sambal berkualitas premium
-          </p>
+          <p className="text-xl text-gray-600">Aneka Abon & Sambal Pak Gondo</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
@@ -62,7 +59,7 @@ export function Products() {
                 />
 
                 <div className="absolute top-4 left-4">
-                  <span className="bg-[#E31E24] text-white px-3 py-1 rounded-full text-sm">
+                  <span className="bg-red-500/50 text-white px-3 py-1 rounded-full text-sm">
                     {product.category}
                   </span>
                 </div>

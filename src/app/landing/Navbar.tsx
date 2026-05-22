@@ -28,6 +28,7 @@ export function Navbar() {
     { name: "Varian Abon", path: "/Gallery" },
     { name: "Mitra Kerja", path: "/mitra-kerja" },
     { name: "Gabung Mitra", path: "/gabung-mitra" },
+    { name: "Kasir", path: "/Kasir" },
   ];
 
   const handleLogoClick = () => {
