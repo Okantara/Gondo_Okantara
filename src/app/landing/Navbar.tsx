@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Store } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 import LogoPakGondo from "../../assets/Logo_Pak_Gondo.png";
@@ -28,7 +28,7 @@ export function Navbar() {
     { name: "Varian Abon", path: "/Gallery" },
     { name: "Mitra Kerja", path: "/mitra-kerja" },
     { name: "Gabung Mitra", path: "/gabung-mitra" },
-    { name: "Kasir", path: "/Kasir" },
+    { name: "Store", path: "/Kasir", icon: true },
   ];
 
   const handleLogoClick = () => {
@@ -38,7 +38,7 @@ export function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 bg-white ${
         isScrolled
           ? "bg-white shadow-md py-3 backdrop-blur-sm"
           : "bg-transparent py-4"
@@ -62,7 +62,7 @@ export function Navbar() {
               to={item.path}
               className="hover:text-orange-500 transition-colors"
             >
-              {item.name}
+              {item.icon ? <Store size={22} /> : item.name}
             </Link>
           ))}
         </div>
@@ -86,7 +86,7 @@ export function Navbar() {
               onClick={() => setIsMobileMenuOpen(false)}
               className="hover:text-orange-500 transition-colors"
             >
-              {item.name}
+              {item.icon ? <Store size={22} /> : item.name}
             </Link>
           ))}
         </div>

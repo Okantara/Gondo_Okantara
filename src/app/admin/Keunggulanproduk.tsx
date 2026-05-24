@@ -211,10 +211,10 @@ export function KeunggulanProduk() {
           {data.map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition overflow-hidden border"
+              className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition overflow-hidden border flex flex-col h-full"
             >
               {/* IMAGE */}
-              <div className="h-48 bg-gray-100">
+              <div className="h-48 bg-gray-100 shrink-0">
                 {item.gambar ? (
                   <img
                     src={item.gambar}
@@ -228,31 +228,37 @@ export function KeunggulanProduk() {
               </div>
 
               {/* CONTENT */}
-              <div className="p-4">
-                <h3 className="font-semibold text-gray-900">{item.title}</h3>
+              <div className="p-4 flex flex-col flex-1">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900 line-clamp-1">
+                    {item.title}
+                  </h3>
 
-                <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-                  {item.subtitle}
-                </p>
+                  <p className="text-sm text-gray-500 mt-1 line-clamp-2 min-h-[40px]">
+                    {item.subtitle}
+                  </p>
 
-                <p className="text-xs text-gray-400 mt-2">
-                  {new Date(item.created_at).toLocaleDateString("id-ID")}
-                </p>
+                  <p className="text-xs text-gray-400 mt-2">
+                    {new Date(item.created_at).toLocaleDateString("id-ID")}
+                  </p>
+                </div>
 
                 {/* ACTION */}
                 <div className="flex gap-2 mt-4">
                   <button
                     onClick={() => openEdit(item)}
-                    className="flex-1 bg-blue-50 text-blue-600 py-2 rounded-lg hover:bg-blue-100"
+                    className="flex-1 h-10 flex items-center justify-center gap-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition"
                   >
-                    <Edit2 size={14} /> Edit
+                    <Edit2 size={14} />
+                    Edit
                   </button>
 
                   <button
                     onClick={() => handleDelete(item.id)}
-                    className="flex-1 bg-red-50 text-red-600 py-2 rounded-lg hover:bg-red-100"
+                    className="flex-1 h-10 flex items-center justify-center gap-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition"
                   >
-                    <Trash2 size={14} /> Hapus
+                    <Trash2 size={14} />
+                    Hapus
                   </button>
                 </div>
               </div>

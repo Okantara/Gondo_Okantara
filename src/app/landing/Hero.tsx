@@ -104,16 +104,14 @@ export function Hero() {
 
       {/* Content */}
       <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
-        <div className="max-w-2xl">
-          <h1 className="text-5xl md:text-6xl text-white mb-4">
+        <div className="max-w-2xl flex flex-col gap-30 md:gap-16">
+          <h1 className="text-4xl md:text-6xl leading-[1.2] md:leading-[1.15] tracking-tight max-w-2xl text-white">
             {activeSlide.title}
           </h1>
 
-          <p className="text-xl md:text-2xl text-white/90 mb-8">
+          <p className="text-lg md:text-2xl text-white/90 leading-8 md:leading-10 text-justify max-w-xl">
             {activeSlide.subtitle}
           </p>
-
-          <div className="flex flex-col sm:flex-row gap-4"></div>
         </div>
       </div>
 

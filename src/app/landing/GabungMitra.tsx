@@ -104,7 +104,7 @@ export function FormKemitraan() {
     >
       <div className="w-full max-w-xl bg-white shadow-lg rounded-2xl p-8">
         <h2 className="text-3xl font-bold text-gray-800 text-center">
-          Data Order
+          Isi Data
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-5">
