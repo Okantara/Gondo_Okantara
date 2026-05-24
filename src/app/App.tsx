@@ -7,7 +7,10 @@ import { Products } from "./landing/Products";
 import { Gallery } from "./landing/Gallery";
 import { Marketplace } from "./landing/Marketplace";
 import { FormKemitraan } from "./landing/GabungMitra";
-import { Order } from "./landing/Order";
+
+// Kasir
+import { LoginKasirPage } from "./Kasir/LoginKasir";
+import { Order } from "./Kasir/Order";
 
 // ADMIN
 import { LoginPage } from "./admin/LoginPage";
@@ -42,11 +45,15 @@ export default function App() {
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/mitra-kerja" element={<Marketplace />} />
             <Route path="/gabung-mitra" element={<FormKemitraan />} />
-            <Route path="/Kasir" element={<Order />} />
+            {/* ================= KASIR PROTECTED ================= */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/kasir" element={<Order />} />
+            </Route>
           </Route>
 
           {/* ================= LOGIN ================= */}
           <Route path="/admin/login" element={<LoginPage />} />
+          <Route path="/kasir/login" element={<LoginKasirPage />} />
 
           {/* ================= ADMIN PROTECTED ================= */}
           <Route element={<ProtectedRoute />}>

@@ -25,10 +25,10 @@ export function Navbar() {
   const menuItems = [
     { name: "Beranda", path: "/" },
     { name: "Katalog", path: "/katalog" },
-    { name: "Varian Abon", path: "/Gallery" },
+    { name: "Varian Abon", path: "/gallery" },
     { name: "Mitra Kerja", path: "/mitra-kerja" },
     { name: "Gabung Mitra", path: "/gabung-mitra" },
-    { name: "Store", path: "/Kasir", icon: true },
+    { name: "Kasir", path: "/kasir/login", icon: true },
   ];
 
   const handleLogoClick = () => {

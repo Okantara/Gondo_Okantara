@@ -17,27 +17,22 @@ export function LoginPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
-  ) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setError("");
     setIsLoading(true);
 
     try {
-      await signIn(
-        formData.username,
-        formData.password
-      );
+      const profile = await signIn(formData.username, formData.password);
+
+      if (profile.role !== "admin") {
+        throw new Error("Akun ini bukan admin");
+      }
 
       navigate("/admin");
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Username atau password salah"
-      );
+      setError(err instanceof Error ? err.message : "Login gagal");
     } finally {
       setIsLoading(false);
     }
@@ -46,7 +41,6 @@ export function LoginPage() {
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-
         {/* HEADER */}
         <div className="bg-linear-to-br from-blue-600 to-blue-700 p-8 text-center">
           <div className="flex justify-center mb-4">
@@ -57,18 +51,12 @@ export function LoginPage() {
             />
           </div>
 
-          <p className="text-blue-100">
-            Silakan login untuk melanjutkan
-          </p>
+          <p className="text-blue-100">Silakan login untuk melanjutkan</p>
         </div>
 
         {/* FORM */}
         <div className="p-8">
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-6"
-          >
-
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* ERROR */}
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
@@ -161,9 +149,7 @@ export function LoginPage() {
               disabled={isLoading}
               className="w-full bg-linear-to-br from-blue-600 to-blue-700 text-white py-3 px-4 rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading
-                ? "Memproses..."
-                : "Login"}
+              {isLoading ? "Memproses..." : "Login"}
             </button>
           </form>
 

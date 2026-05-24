@@ -82,7 +82,9 @@ export function Features() {
                     {feature.title}
                   </h3>
 
-                  <p className="text-gray-600">{feature.subtitle}</p>
+                  <p className="text-lg text-gray-600 leading-7 break-words whitespace-normal max-w-[220px] mx-auto">
+                    {feature.subtitle}
+                  </p>
                 </div>
               );
             })}
