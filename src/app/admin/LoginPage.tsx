@@ -30,6 +30,7 @@ export function LoginPage() {
         throw new Error("Akun ini bukan admin");
       }
 
+      // Navigate langsung ke /admin
       navigate("/admin");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login gagal");

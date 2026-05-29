@@ -46,7 +46,7 @@ export default function App() {
             <Route path="/mitra-kerja" element={<Marketplace />} />
             <Route path="/gabung-mitra" element={<FormKemitraan />} />
             {/* ================= KASIR PROTECTED ================= */}
-            <Route element={<ProtectedRoute />}>
+            <Route element={<ProtectedRoute requiredRole="kasir" />}>
               <Route path="/kasir" element={<Order />} />
             </Route>
           </Route>
@@ -56,7 +56,7 @@ export default function App() {
           <Route path="/kasir/login" element={<LoginKasirPage />} />
 
           {/* ================= ADMIN PROTECTED ================= */}
-          <Route element={<ProtectedRoute />}>
+          <Route element={<ProtectedRoute requiredRole="admin" />}>
             <Route path="/admin" element={<DashboardLayout />}>
               <Route index element={<DashboardHome />} />
               <Route path="Galerry" element={<ProductsPage />} />

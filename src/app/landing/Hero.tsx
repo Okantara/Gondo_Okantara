@@ -15,24 +15,38 @@ interface Slide {
 export function Hero() {
   const [slides, setSlides] = useState<Slide[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // ambil data slides dari database
   useEffect(() => {
     const fetchSlides = async () => {
-      const { data, error } = await supabase
-        .from("slides")
-        .select("*")
-        .eq("is_active", true)
-        .order("order", { ascending: true });
+      try {
+        setLoading(true);
+        setError(null);
 
-      if (error) {
-        console.error("Error fetch slides:", error);
-        return;
+        const { data, error: fetchError } = await supabase
+          .from("slides")
+          .select("*")
+          .eq("is_active", true)
+          .order("order", { ascending: true });
+
+        if (fetchError) throw fetchError;
+
+        if (!data || data.length === 0) {
+          setError("Tidak ada slides yang tersedia");
+          setSlides([]);
+          return;
+        }
+
+        setSlides(data);
+      } catch (err) {
+        console.error("Error fetch slides:", err);
+        setError("Gagal memuat slides");
+        setSlides([]);
+      } finally {
+        setLoading(false);
       }
-
-      console.log("Slides data:", data);
-
-      setSlides(data || []);
     };
 
     fetchSlides();
@@ -64,10 +78,27 @@ export function Hero() {
   };
 
   // loading
-  if (slides.length === 0) {
+  if (loading || slides.length === 0) {
     return (
       <section className="h-150 flex items-center justify-center bg-[#FFF8F0]">
-        Loading...
+        <div className="text-center">
+          {error ? (
+            <div>
+              <div className="text-red-600 font-semibold mb-4">{error}</div>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
+              >
+                Refresh Halaman
+              </button>
+            </div>
+          ) : (
+            <div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Memuat slides...</p>
+            </div>
+          )}
+        </div>
       </section>
     );
   }

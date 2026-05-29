@@ -21,6 +21,7 @@ const iconMap: Record<string, any> = {
 export function Features() {
   const [features, setFeatures] = useState<KeunggulanItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchFeatures();
@@ -29,17 +30,20 @@ export function Features() {
   async function fetchFeatures() {
     try {
       setLoading(true);
+      setError(null);
 
-      const { data, error } = await supabase
+      const { data, error: fetchError } = await supabase
         .from("keunggulan")
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (fetchError) throw fetchError;
 
       setFeatures(data || []);
     } catch (err) {
       console.error("Gagal mengambil data:", err);
+      setError("Gagal memuat data keunggulan. Silakan refresh halaman.");
+      setFeatures([]);
     } finally {
       setLoading(false);
     }
@@ -50,11 +54,29 @@ export function Features() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* LOADING */}
         {loading && (
-          <div className="text-center text-gray-500">Memuat data...</div>
+          <div className="text-center text-gray-500">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
+            <p>Memuat data...</p>
+          </div>
+        )}
+
+        {/* ERROR */}
+        {error && !loading && (
+          <div className="text-center">
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg inline-block mb-4">
+              {error}
+            </div>
+            <button
+              onClick={fetchFeatures}
+              className="mt-4 px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
+            >
+              Coba Lagi
+            </button>
+          </div>
         )}
 
         {/* DATA */}
-        {!loading && (
+        {!loading && !error && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature) => {
               const Icon = iconMap[feature.title] || Sparkles;
@@ -92,7 +114,7 @@ export function Features() {
         )}
 
         {/* EMPTY */}
-        {!loading && features.length === 0 && (
+        {!loading && !error && features.length === 0 && (
           <div className="text-center text-gray-500 py-10">
             Belum ada data keunggulan
           </div>

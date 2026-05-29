@@ -30,6 +30,7 @@ export function LoginKasirPage() {
         throw new Error("Akun ini bukan kasir");
       }
 
+      // Navigate langsung ke /kasir
       navigate("/kasir");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login gagal");
