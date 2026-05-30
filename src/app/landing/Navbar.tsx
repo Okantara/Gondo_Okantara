@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Store } from "lucide-react";
+import { Menu, X, Store, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
 import LogoPakGondo from "../../assets/Logo_Pak_Gondo.png";
 
@@ -9,6 +10,7 @@ export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigate = useNavigate();
+  const { user, profile, signOut } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,18 +24,32 @@ export function Navbar() {
     };
   }, []);
 
+  // Tentukan path kasir berdasarkan login status
+  const kasirPath =
+    user && profile?.role === "kasir" ? "/kasir" : "/kasir/login";
+
   const menuItems = [
     { name: "Beranda", path: "/" },
     { name: "Katalog", path: "/katalog" },
     { name: "Varian Abon", path: "/gallery" },
     { name: "Mitra Kerja", path: "/mitra-kerja" },
     { name: "Gabung Mitra", path: "/gabung-mitra" },
-    { name: "Kasir", path: "/kasir/login", icon: true },
+    { name: "Kasir", path: kasirPath, icon: true },
   ];
 
   const handleLogoClick = () => {
     navigate("/");
     setIsMobileMenuOpen(false);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate("/", { replace: true });
+      setIsMobileMenuOpen(false);
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
   };
 
   return (
@@ -65,6 +81,18 @@ export function Navbar() {
               {item.icon ? <Store size={22} /> : item.name}
             </Link>
           ))}
+
+          {/* LOGOUT BUTTON - Hanya tampil jika user login */}
+          {user && profile && (
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+              title="Logout"
+            >
+              <LogOut size={20} />
+              <span className="text-sm">Logout</span>
+            </button>
+          )}
         </div>
 
         {/* MOBILE BUTTON */}
@@ -89,6 +117,17 @@ export function Navbar() {
               {item.icon ? <Store size={22} /> : item.name}
             </Link>
           ))}
+
+          {/* LOGOUT BUTTON - Hanya tampil jika user login */}
+          {user && profile && (
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors w-full"
+            >
+              <LogOut size={20} />
+              <span className="text-sm">Logout</span>
+            </button>
+          )}
         </div>
       )}
     </nav>

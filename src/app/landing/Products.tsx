@@ -8,6 +8,7 @@ interface Product {
   judul: string;
   deskripsi: string;
   category: string;
+  harga: string;
 }
 
 export function Products() {
@@ -71,8 +72,12 @@ export function Products() {
                   {product.judul}
                 </h3>
 
-                <p className="text-gray-600 mb-6 line-clamp-3 min-h-[1px]">
+                <p className="text-gray-600 line-clamp-3 min-h-[1px] text-justify mb-1">
                   {product.deskripsi}
+                </p>
+
+                <p className="text-2xl font-bold text-red-600">
+                  Rp {(product.harga || 0).toLocaleString("id-ID")}
                 </p>
               </div>
             </div>

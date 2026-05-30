@@ -10,6 +10,7 @@ import {
   Menu,
   X,
   LogOut,
+  CreditCard,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -26,6 +27,11 @@ const navItems = [
     path: "/admin/keunggulan-produk",
     icon: Feather,
     label: "Keunggulan Produk",
+  },
+  {
+    path: "/admin/metode-pembayaran",
+    icon: CreditCard,
+    label: "Metode Pembayaran",
   },
 ];
 

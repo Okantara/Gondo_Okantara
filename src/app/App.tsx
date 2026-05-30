@@ -9,11 +9,10 @@ import { Marketplace } from "./landing/Marketplace";
 import { FormKemitraan } from "./landing/GabungMitra";
 
 // Kasir
-import { LoginKasirPage } from "./Kasir/LoginKasir";
 import { Order } from "./Kasir/Order";
+import { KasirDashboard } from "./Kasir/KasirDashboard";
 
 // ADMIN
-import { LoginPage } from "./admin/LoginPage";
 import { DashboardHome } from "./admin/DashboardHome";
 import { KatalogPage } from "./admin/KatalogPage";
 import { ProductsPage } from "./admin/ProductsPage";
@@ -22,6 +21,10 @@ import { KeunggulanProduk } from "./admin/Keunggulanproduk";
 import { MitraManagementPage } from "./admin/MitraManagementPage";
 import { MitraPage } from "./admin/MitraPage";
 import { SlidesPage } from "./admin/SlidesPage";
+import { MetodePembayaranPage } from "./admin/PembayaranPage";
+
+// AUTH
+import { UnifiedLoginPage } from "./auth/UnifiedLoginPage";
 
 // LAYOUT
 import { LandingLayout } from "./layouts/LandingLayout";
@@ -45,15 +48,25 @@ export default function App() {
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/mitra-kerja" element={<Marketplace />} />
             <Route path="/gabung-mitra" element={<FormKemitraan />} />
-            {/* ================= KASIR PROTECTED ================= */}
-            <Route element={<ProtectedRoute requiredRole="kasir" />}>
-              <Route path="/kasir" element={<Order />} />
-            </Route>
           </Route>
 
-          {/* ================= LOGIN ================= */}
-          <Route path="/admin/login" element={<LoginPage />} />
-          <Route path="/kasir/login" element={<LoginKasirPage />} />
+          {/* ================= LOGIN PAGES ================= */}
+          {/* Unified login yang dapat diakses dari kedua path */}
+          <Route path="/login" element={<UnifiedLoginPage mode="auto" />} />
+          <Route
+            path="/admin/login"
+            element={<UnifiedLoginPage mode="admin" />}
+          />
+          <Route
+            path="/kasir/login"
+            element={<UnifiedLoginPage mode="kasir" />}
+          />
+
+          {/* ================= KASIR PROTECTED ================= */}
+          <Route element={<ProtectedRoute requiredRole="kasir" />}>
+            <Route path="/kasir" element={<KasirDashboard />} />
+            <Route path="/kasir/order" element={<Order />} />
+          </Route>
 
           {/* ================= ADMIN PROTECTED ================= */}
           <Route element={<ProtectedRoute requiredRole="admin" />}>
@@ -68,6 +81,10 @@ export default function App() {
               <Route
                 path="mitra-management"
                 element={<MitraManagementPage />}
+              />
+              <Route
+                path="metode-pembayaran"
+                element={<MetodePembayaranPage />}
               />
             </Route>
           </Route>

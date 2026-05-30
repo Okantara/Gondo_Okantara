@@ -18,6 +18,7 @@ interface GalleryImage {
   category: string;
   created_at: string;
   updated_at: string;
+  harga: number;
 }
 
 interface Toast {
@@ -42,6 +43,7 @@ export function KatalogPage() {
     judul: string;
     deskripsi: string;
     category: string;
+    harga: number | "";
   }>({
     image: null,
     preview_url: "",
@@ -49,6 +51,7 @@ export function KatalogPage() {
     judul: "",
     deskripsi: "",
     category: "",
+    harga: "",
   });
 
   const [categories, setCategories] = useState<string[]>([]);
@@ -127,6 +130,7 @@ export function KatalogPage() {
       judul: "",
       deskripsi: "",
       category: "",
+      harga: "",
     });
 
     setEditingId(null);
@@ -197,6 +201,11 @@ export function KatalogPage() {
       return;
     }
 
+    if (formData.harga === "" || Number(formData.harga) <= 0) {
+      showToast("Harga harus diisi dan lebih dari 0", "error");
+      return;
+    }
+
     let finalImageUrl = formData.image_url;
 
     if (formData.image) {
@@ -230,6 +239,7 @@ export function KatalogPage() {
             judul: formData.judul.trim(),
             deskripsi: formData.deskripsi.trim(),
             category: formData.category.trim(),
+            harga: Number(formData.harga),
             updated_at: new Date().toISOString(),
           })
           .eq("id", editingId);
@@ -248,6 +258,7 @@ export function KatalogPage() {
             judul: formData.judul.trim(),
             deskripsi: formData.deskripsi.trim(),
             category: formData.category.trim(),
+            harga: Number(formData.harga),
           },
         ]);
 
@@ -305,6 +316,7 @@ export function KatalogPage() {
       judul: img.judul,
       deskripsi: img.deskripsi,
       category: img.category,
+      harga: img.harga || "",
     });
 
     setIsModalOpen(true);
@@ -462,6 +474,9 @@ export function KatalogPage() {
                 <p className="text-sm text-gray-500 line-clamp-2">
                   {image.deskripsi}
                 </p>
+                <p className="text-sm font-bold text-red-600 mt-2">
+                  Rp {(image.harga || 0).toLocaleString("id-ID")}
+                </p>
                 <span className="text-xs text-gray-400">{image.category}</span>
               </div>
             </div>
@@ -535,6 +550,31 @@ export function KatalogPage() {
               }
               required
             />
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Harga</label>
+
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                  Rp
+                </span>
+
+                <input
+                  type="number"
+                  className="w-full border p-3 pl-10 rounded-lg"
+                  placeholder="Harga produk"
+                  value={formData.harga}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      harga:
+                        e.target.value === "" ? "" : Number(e.target.value),
+                    })
+                  }
+                  required
+                />
+              </div>
+            </div>
 
             <div className="space-y-2">
               <label className="block text-sm font-medium">Kategori</label>

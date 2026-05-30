@@ -26,12 +26,14 @@ export function LoginPage() {
     try {
       const profile = await signIn(formData.username, formData.password);
 
-      if (profile.role !== "admin") {
-        throw new Error("Akun ini bukan admin");
+      // Redirect berdasarkan role user
+      if (profile.role === "admin") {
+        navigate("/admin");
+      } else if (profile.role === "kasir") {
+        navigate("/kasir");
+      } else {
+        throw new Error("Role tidak dikenali");
       }
-
-      // Navigate langsung ke /admin
-      navigate("/admin");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login gagal");
     } finally {

@@ -26,12 +26,14 @@ export function LoginKasirPage() {
     try {
       const profile = await signIn(formData.username, formData.password);
 
-      if (profile.role !== "kasir") {
-        throw new Error("Akun ini bukan kasir");
+      // Redirect berdasarkan role user
+      if (profile.role === "kasir") {
+        navigate("/kasir");
+      } else if (profile.role === "admin") {
+        navigate("/admin");
+      } else {
+        throw new Error("Role tidak dikenali");
       }
-
-      // Navigate langsung ke /kasir
-      navigate("/kasir");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login gagal");
     } finally {

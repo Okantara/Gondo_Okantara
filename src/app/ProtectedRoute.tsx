@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 
 interface ProtectedRouteProps {
@@ -8,7 +8,8 @@ interface ProtectedRouteProps {
 
 export default function ProtectedRoute({ requiredRole }: ProtectedRouteProps) {
   const navigate = useNavigate();
-  const { user, profile, loading } = useAuth();
+  const location = useLocation();
+  const { user, profile, loading, signOut } = useAuth();
   const [loadingTimeout, setLoadingTimeout] = useState(false);
 
   useEffect(() => {
@@ -34,21 +35,35 @@ export default function ProtectedRoute({ requiredRole }: ProtectedRouteProps) {
       return;
     }
 
-    // Jika ada role requirement, cek apakah user memiliki role yang tepat
+    // Validasi role - STRICT CHECK
+    // Jika ada role requirement, user HARUS memiliki role yang tepat
     if (requiredRole && profile.role !== requiredRole) {
-      // Redirect ke halaman login yang sesuai dengan role user
+      // Jika user mencoba akses area dengan role berbeda, logout dan redirect ke login
+      const handleMismatch = async () => {
+        try {
+          await signOut();
+        } catch (err) {
+          console.error("Logout error:", err);
+        }
+
+        // Redirect ke login page yang sesuai dengan role user
+        const loginPath =
+          profile.role === "kasir" ? "/kasir/login" : "/admin/login";
+        navigate(loginPath, { replace: true });
+      };
+
+      handleMismatch();
+      return;
+    }
+
+    // Jika akun tidak aktif, redirect ke login
+    if (!profile.is_active) {
       const loginPath =
         profile.role === "kasir" ? "/kasir/login" : "/admin/login";
       navigate(loginPath, { replace: true });
       return;
     }
-
-    // Jika akun tidak aktif, logout
-    if (!profile.is_active) {
-      navigate("/admin/login", { replace: true });
-      return;
-    }
-  }, [user, profile, loading, navigate, requiredRole]);
+  }, [user, profile, loading, navigate, requiredRole, location, signOut]);
 
   // Saat loading, tampilkan loading spinner
   if (loading) {
@@ -73,8 +88,8 @@ export default function ProtectedRoute({ requiredRole }: ProtectedRouteProps) {
     );
   }
 
-  // Jika user dan profile ada, render outlet
-  if (user && profile) {
+  // Jika user dan profile ada dan role sesuai, render outlet
+  if (user && profile && (!requiredRole || profile.role === requiredRole)) {
     return <Outlet />;
   }
 
