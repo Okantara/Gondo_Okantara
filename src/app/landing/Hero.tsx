@@ -120,7 +120,7 @@ export function Hero() {
               }`}
             >
               {/* overlay */}
-              <div className="absolute inset-0 bg-black/50 z-10" />
+              <div className="absolute inset-0 bg-black/15 z-10" />
 
               {/* image */}
               <img

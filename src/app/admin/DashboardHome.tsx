@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ImagePlay, ShoppingBasket, Image, Handshake } from "lucide-react";
 import { supabase } from "../../lib/supabase";
+import { VisitorStatsComponent } from "./VisitorStats";
 
 export function DashboardHome() {
   const [counts, setCounts] = useState({
@@ -154,6 +155,14 @@ export function DashboardHome() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Visitor Stats Section */}
+      <div className="mt-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          Statistik Pengunjung
+        </h2>
+        <VisitorStatsComponent />
       </div>
     </div>
   );
