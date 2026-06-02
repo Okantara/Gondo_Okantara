@@ -1,47 +1,22 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
-  ShoppingBasket,
-  Image,
-  User,
-  ImagePlay,
-  Handshake,
-  Feather,
+  ShoppingCart,
+  Lock,
   Menu,
   X,
   LogOut,
-  CreditCard,
-  Lock,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 
 const navItems = [
-  { path: "/admin", icon: LayoutDashboard, label: "Dashboard" },
-  { path: "/admin/slides", icon: ImagePlay, label: "Image Slides" },
-  { path: "/admin/Katalog", icon: Image, label: "Katalog Produk" },
-  { path: "/admin/Galerry", icon: ShoppingBasket, label: "Varian Abon" },
-  { path: "/admin/MitraPage", icon: Handshake, label: "Data Mitra" },
-  { path: "/admin/mitra-management", icon: Handshake, label: "Kelola Mitra" },
-  { path: "/admin/profile", icon: User, label: "Profil Toko" },
-  {
-    path: "/admin/keunggulan-produk",
-    icon: Feather,
-    label: "Keunggulan Produk",
-  },
-  {
-    path: "/admin/metode-pembayaran",
-    icon: CreditCard,
-    label: "Metode Pembayaran",
-  },
-  {
-    path: "/admin/password-management",
-    icon: Lock,
-    label: "Manajemen Password",
-  },
+  { path: "/kasir", icon: LayoutDashboard, label: "Dashboard" },
+  { path: "/kasir/order", icon: ShoppingCart, label: "Pesanan" },
+  { path: "/kasir/password", icon: Lock, label: "Ubah Password" },
 ];
 
-export function DashboardLayout() {
+export function KasirLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut } = useAuth();
@@ -51,7 +26,7 @@ export function DashboardLayout() {
     if (confirm("Apakah Anda yakin ingin logout?")) {
       try {
         await signOut();
-        navigate("/admin/login", { replace: true });
+        navigate("/kasir/login", { replace: true });
       } catch (error) {
         console.error("Logout error:", error);
         alert("Gagal logout");
@@ -77,10 +52,8 @@ export function DashboardLayout() {
       >
         <div className="h-full px-3 py-4 overflow-y-auto">
           <div className="mb-8 px-3">
-            <h1 className="text-2xl font-bold text-gray-800">
-              Admin Dashboard
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">Kelola toko Anda</p>
+            <h1 className="text-2xl font-bold text-gray-800">Kasir</h1>
+            <p className="text-sm text-gray-500 mt-1">Kelola pesanan</p>
           </div>
 
           <nav className="space-y-2">

@@ -7,8 +7,6 @@ interface Product {
   image_url: string;
   judul: string;
   deskripsi: string;
-  category: string;
-  harga: string;
 }
 
 export function Products() {
@@ -59,11 +57,7 @@ export function Products() {
                   className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                 />
 
-                <div className="absolute top-4 left-4">
-                  <span className="bg-red-500/50 text-white px-3 py-1 rounded-full text-sm">
-                    {product.category}
-                  </span>
-                </div>
+                <div className="absolute top-4 left-4"></div>
               </div>
 
               {/* CONTENT */}
@@ -74,10 +68,6 @@ export function Products() {
 
                 <p className="text-gray-600 line-clamp-3 min-h-[1px] text-justify mb-1">
                   {product.deskripsi}
-                </p>
-
-                <p className="text-2xl font-bold text-red-600">
-                  Rp {(product.harga || 0).toLocaleString("id-ID")}
                 </p>
               </div>
             </div>

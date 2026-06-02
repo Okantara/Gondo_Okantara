@@ -11,6 +11,8 @@ import { FormKemitraan } from "./landing/GabungMitra";
 // Kasir
 import { Order } from "./Kasir/Order";
 import { KasirDashboard } from "./Kasir/KasirDashboard";
+import { KasirLayout } from "./Kasir/KasirLayout";
+import { PasswordManagementKasir } from "./Kasir/PasswordManagementKasir";
 
 // ADMIN
 import { DashboardHome } from "./admin/DashboardHome";
@@ -22,6 +24,7 @@ import { MitraManagementPage } from "./admin/MitraManagementPage";
 import { MitraPage } from "./admin/MitraPage";
 import { SlidesPage } from "./admin/SlidesPage";
 import { MetodePembayaranPage } from "./admin/PembayaranPage";
+import { PasswordManagementPage } from "./admin/PasswordManagementPage";
 
 // AUTH
 import { UnifiedLoginPage } from "./auth/UnifiedLoginPage";
@@ -66,8 +69,11 @@ export default function App() {
 
             {/* ================= KASIR PROTECTED ================= */}
             <Route element={<ProtectedRoute requiredRole="kasir" />}>
-              <Route path="/kasir" element={<KasirDashboard />} />
-              <Route path="/kasir/order" element={<Order />} />
+              <Route path="/kasir" element={<KasirLayout />}>
+                <Route index element={<KasirDashboard />} />
+                <Route path="order" element={<Order />} />
+                <Route path="password" element={<PasswordManagementKasir />} />
+              </Route>
             </Route>
 
             {/* ================= ADMIN PROTECTED ================= */}
@@ -90,6 +96,10 @@ export default function App() {
                 <Route
                   path="metode-pembayaran"
                   element={<MetodePembayaranPage />}
+                />
+                <Route
+                  path="password-management"
+                  element={<PasswordManagementPage />}
                 />
               </Route>
             </Route>
