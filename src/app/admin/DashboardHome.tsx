@@ -1,5 +1,14 @@
 import { useEffect, useState } from "react";
-import { ImagePlay, ShoppingBasket, Image, Handshake } from "lucide-react";
+import {
+  ImagePlay,
+  ShoppingBasket,
+  Image,
+  Handshake,
+  Home,
+  DollarSign,
+  CalendarDays,
+  CalendarRange,
+} from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { VisitorStatsComponent } from "./VisitorStats";
 
@@ -11,29 +20,49 @@ export function DashboardHome() {
     mitra: 0,
   });
 
+  const [salesStats, setSalesStats] = useState({
+    today: 0,
+    week: 0,
+    month: 0,
+  });
+
   const [loading, setLoading] = useState(true);
 
+  const formatRupiah = (value: number) => {
+    return `Rp ${Number(value || 0).toLocaleString("id-ID")}`;
+  };
+
   useEffect(() => {
-    const fetchCounts = async () => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
       setLoading(true);
 
-      const [sliderResult, produkResult, varianResult, mitraResult] =
-        await Promise.all([
-          supabase.from("slides").select("*", { count: "exact", head: true }),
+      const [
+        sliderResult,
+        produkResult,
+        varianResult,
+        mitraResult,
+        pembelianResult,
+      ] = await Promise.all([
+        supabase.from("slides").select("*", { count: "exact", head: true }),
 
-          supabase.from("katalog").select("*", { count: "exact", head: true }),
+        supabase.from("katalog").select("*", { count: "exact", head: true }),
 
-          supabase.from("gallery").select("*", { count: "exact", head: true }),
+        supabase.from("gallery").select("*", { count: "exact", head: true }),
 
-          supabase
-            .from("mitrakerja")
-            .select("*", { count: "exact", head: true }),
-        ]);
+        supabase.from("mitrakerja").select("*", { count: "exact", head: true }),
+
+        supabase.from("pembelian").select("total, created_at"),
+      ]);
 
       if (sliderResult.error) console.error(sliderResult.error);
       if (produkResult.error) console.error(produkResult.error);
       if (varianResult.error) console.error(varianResult.error);
       if (mitraResult.error) console.error(mitraResult.error);
+      if (pembelianResult.error) console.error(pembelianResult.error);
 
       setCounts({
         slider: sliderResult.count || 0,
@@ -42,11 +71,42 @@ export function DashboardHome() {
         mitra: mitraResult.count || 0,
       });
 
-      setLoading(false);
-    };
+      const pembelianData = pembelianResult.data || [];
+      const now = new Date();
 
-    fetchCounts();
-  }, []);
+      const startToday = new Date(now);
+      startToday.setHours(0, 0, 0, 0);
+
+      const startWeek = new Date(now);
+      startWeek.setDate(now.getDate() - now.getDay());
+      startWeek.setHours(0, 0, 0, 0);
+
+      const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      startMonth.setHours(0, 0, 0, 0);
+
+      const totalToday = pembelianData
+        .filter((item) => new Date(item.created_at) >= startToday)
+        .reduce((sum, item) => sum + Number(item.total || 0), 0);
+
+      const totalWeek = pembelianData
+        .filter((item) => new Date(item.created_at) >= startWeek)
+        .reduce((sum, item) => sum + Number(item.total || 0), 0);
+
+      const totalMonth = pembelianData
+        .filter((item) => new Date(item.created_at) >= startMonth)
+        .reduce((sum, item) => sum + Number(item.total || 0), 0);
+
+      setSalesStats({
+        today: totalToday,
+        week: totalWeek,
+        month: totalMonth,
+      });
+    } catch (error) {
+      console.error("Gagal mengambil data dashboard:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const stats = [
     {
@@ -75,32 +135,72 @@ export function DashboardHome() {
     },
   ];
 
+  const salesCards = [
+    {
+      title: "Penjualan Hari Ini",
+      value: salesStats.today,
+      icon: DollarSign,
+      color: "bg-red-500",
+    },
+    {
+      title: "Penjualan Minggu Ini",
+      value: salesStats.week,
+      icon: CalendarDays,
+      color: "bg-indigo-500",
+    },
+    {
+      title: "Penjualan Bulan Ini",
+      value: salesStats.month,
+      icon: CalendarRange,
+      color: "bg-emerald-500",
+    },
+  ];
+
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-2">Selamat datang di admin dashboard</p>
+      <div className="mb-8 flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="mt-2 text-gray-600">
+            Selamat datang di admin dashboard
+          </p>
+        </div>
+
+        <a
+          href="/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 rounded-lg border bg-white p-4 shadow transition hover:shadow-lg"
+        >
+          <div className="rounded-md bg-blue-500 p-2">
+            <Home className="text-white" size={20} />
+          </div>
+
+          <div>
+            <p className="font-semibold text-gray-900">Home</p>
+          </div>
+        </a>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => {
           const Icon = stat.icon;
 
           return (
             <div
               key={stat.title}
-              className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
+              className="rounded-lg bg-white p-6 shadow transition-shadow hover:shadow-lg"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">{stat.title}</p>
+                  <p className="mb-1 text-sm text-gray-600">{stat.title}</p>
 
                   <p className="text-2xl font-bold text-gray-900">
                     {loading ? "..." : stat.value}
                   </p>
                 </div>
 
-                <div className={`${stat.color} p-3 rounded-lg`}>
+                <div className={`${stat.color} rounded-lg p-3`}>
                   <Icon className="text-white" size={24} />
                 </div>
               </div>
@@ -109,57 +209,41 @@ export function DashboardHome() {
         })}
       </div>
 
-      <div className="mt-8 bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Ringkasan Data</h2>
+      <div className="mb-8">
+        <h2 className="mb-6 text-2xl font-bold text-gray-900">
+          Statistik Penjualan
+        </h2>
 
-        <div className="space-y-4">
-          <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
-            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-            <div className="flex-1">
-              <p className="font-medium">Total image slider: {counts.slider}</p>
-              <p className="text-sm text-gray-600">
-                Data diambil dari tabel image_slider
-              </p>
-            </div>
-          </div>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {salesCards.map((item) => {
+            const Icon = item.icon;
 
-          <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <div className="flex-1">
-              <p className="font-medium">
-                Total katalog produk: {counts.produk}
-              </p>
-              <p className="text-sm text-gray-600">
-                Data diambil dari tabel produk
-              </p>
-            </div>
-          </div>
+            return (
+              <div
+                key={item.title}
+                className="rounded-lg bg-white p-6 shadow transition-shadow hover:shadow-lg"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="mb-1 text-sm text-gray-600">{item.title}</p>
 
-          <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
-            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-            <div className="flex-1">
-              <p className="font-medium">Total varian abon: {counts.varian}</p>
-              <p className="text-sm text-gray-600">
-                Data diambil dari tabel varian_abon
-              </p>
-            </div>
-          </div>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {loading ? "..." : formatRupiah(item.value)}
+                    </p>
+                  </div>
 
-          <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
-            <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-            <div className="flex-1">
-              <p className="font-medium">Total mitra kerja: {counts.mitra}</p>
-              <p className="text-sm text-gray-600">
-                Data diambil dari tabel mitrakerja
-              </p>
-            </div>
-          </div>
+                  <div className={`${item.color} rounded-lg p-3`}>
+                    <Icon className="text-white" size={24} />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      {/* Visitor Stats Section */}
       <div className="mt-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        <h2 className="mb-6 text-2xl font-bold text-gray-900">
           Statistik Pengunjung
         </h2>
         <VisitorStatsComponent />

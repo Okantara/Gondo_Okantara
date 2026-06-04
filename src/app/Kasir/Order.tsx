@@ -307,80 +307,115 @@ export function Order() {
       {loading ? (
         <p className="text-center">Loading...</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {products.map((product) => (
-            <div
-              key={product.id}
-              className={`flex flex-row sm:flex-col border rounded-2xl overflow-hidden ${
-                product.quantity > 0 ? "border-red-400" : "border-gray-200"
-              }`}
-            >
-              <div className="w-24 h-24 sm:w-full sm:h-48 bg-gray-100 m-5 md:m-0">
-                <img
-                  src={product.image_url}
-                  alt={product.judul}
-                  className="w-full h-full object-contain p-2"
-                />
-              </div>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Produk */}
+          <div className="lg:col-span-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {products.map((product) => (
+                <div
+                  key={product.id}
+                  className={`flex flex-row sm:flex-col border rounded-2xl overflow-hidden ${
+                    product.quantity > 0 ? "border-red-400" : "border-gray-200"
+                  }`}
+                >
+                  <div className="w-24 h-24 sm:w-full sm:h-48 bg-gray-100 m-5 md:m-0">
+                    <img
+                      src={product.image_url}
+                      alt={product.judul}
+                      className="w-full h-full object-contain p-2"
+                    />
+                  </div>
 
-              <div className="flex-1 p-3 flex flex-col justify-between">
-                <div>
-                  <p className="text-xs text-red-500">{product.category}</p>
+                  <div className="flex-1 p-3 flex flex-col justify-between">
+                    <div>
+                      <p className="text-xs text-red-500">{product.category}</p>
 
-                  <h3 className="font-bold text-sm sm:text-base line-clamp-2">
-                    {product.judul}
-                  </h3>
+                      <h3 className="font-bold text-sm sm:text-base line-clamp-2">
+                        {product.judul}
+                      </h3>
 
-                  <p className="text-red-600 font-bold text-sm">
-                    Rp {product.harga.toLocaleString("id-ID")}
-                  </p>
+                      <p className="text-red-600 font-bold text-sm">
+                        Rp {product.harga.toLocaleString("id-ID")}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-between mt-2 bg-gray-100 rounded-xl p-2">
+                      <button
+                        type="button"
+                        onClick={() => updateQuantity(product.id, "minus")}
+                        className="w-8 h-8 bg-red-100 rounded-lg"
+                      >
+                        −
+                      </button>
+
+                      <span className="font-bold">{product.quantity}</span>
+
+                      <button
+                        type="button"
+                        onClick={() => updateQuantity(product.id, "plus")}
+                        className="w-8 h-8 bg-green-100 rounded-lg"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
                 </div>
-
-                <div className="flex items-center justify-between mt-2 bg-gray-100 rounded-xl p-2">
-                  <button
-                    type="button"
-                    onClick={() => updateQuantity(product.id, "minus")}
-                    className="w-8 h-8 bg-red-100 rounded-lg"
-                  >
-                    −
-                  </button>
-
-                  <span className="font-bold">{product.quantity}</span>
-
-                  <button
-                    type="button"
-                    onClick={() => updateQuantity(product.id, "plus")}
-                    className="w-8 h-8 bg-green-100 rounded-lg"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
+              ))}
             </div>
-          ))}
+          </div>
+          {/* Ringkasan Pesanan */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-4 bg-white border rounded-2xl p-4 shadow-sm">
+              <h3 className="font-bold text-lg mb-4">Ringkasan Pesanan</h3>
+
+              {selectedProducts.length === 0 ? (
+                <p className="text-sm text-gray-500">
+                  Belum ada produk dipilih
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {selectedProducts.map((item) => (
+                    <div key={item.id} className="border-b pb-2">
+                      <p className="font-medium text-sm">{item.judul}</p>
+
+                      <div className="flex justify-between text-xs text-gray-500">
+                        <span>
+                          {item.quantity} x Rp{" "}
+                          {item.harga.toLocaleString("id-ID")}
+                        </span>
+
+                        <span>
+                          Rp{" "}
+                          {(item.quantity * item.harga).toLocaleString("id-ID")}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="pt-3 border-t">
+                    <div className="flex justify-between font-bold text-red-600">
+                      <span>Total</span>
+                      <span>Rp {totalHarga.toLocaleString("id-ID")}</span>
+                    </div>
+
+                    <div className="mt-2 text-xs text-gray-500">
+                      {selectedMetodePembayaran?.nama ||
+                        "Belum pilih pembayaran"}
+                    </div>
+
+                    <button
+                      onClick={handlePesan}
+                      className="w-full mt-4 bg-red-600 text-white py-3 rounded-xl"
+                    >
+                      Pesan Sekarang
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
-
-      <div className="mt-10 flex justify-between items-center border-t pt-5">
-        <div>
-          <p className="text-gray-500">Total</p>
-
-          <h2 className="text-2xl font-bold text-red-600">
-            Rp {totalHarga.toLocaleString("id-ID")}
-          </h2>
-
-          <p className="text-sm text-gray-500">
-            {selectedMetodePembayaran?.nama || "Belum pilih pembayaran"}
-          </p>
-        </div>
-
-        <button
-          onClick={handlePesan}
-          className="bg-red-600 text-white px-6 py-3 rounded-2xl"
-        >
-          Pesan
-        </button>
-      </div>
     </div>
   );
 }

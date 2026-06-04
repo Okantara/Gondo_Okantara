@@ -11,9 +11,8 @@ import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 
 const navItems = [
-  { path: "/kasir", icon: LayoutDashboard, label: "Dashboard" },
+  { path: "/kasir", icon: LayoutDashboard, label: "Arsip" },
   { path: "/kasir/order", icon: ShoppingCart, label: "Pesanan" },
-  { path: "/kasir/password", icon: Lock, label: "Ubah Password" },
 ];
 
 export function KasirLayout() {

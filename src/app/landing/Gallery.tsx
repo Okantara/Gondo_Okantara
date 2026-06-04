@@ -33,15 +33,7 @@ export function Gallery() {
   return (
     <section id="galeri" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl text-gray-900 mb-4 uppercase">
-            Berbahan Abon
-          </h2>
-
-          <p className="text-xm text-gray-600 uppercase">
-            Bersertifikasi Halal Dan Higenis Tanpa Bahan Pengawet
-          </p>
-        </div>
+        <div className="text-center mb-16"></div>
 
         <Masonry columnsCount={3} gutter="1rem">
           {galleryImages.map((image) => (

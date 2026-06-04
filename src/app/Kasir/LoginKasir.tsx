@@ -53,11 +53,7 @@ export function LoginKasirPage() {
             />
           </div>
 
-          <h1 className="text-2xl font-semibold text-white">Login Kasir</h1>
-
-          <p className="text-orange-100 mt-2">
-            Silakan login untuk membuka menu kasir
-          </p>
+          <h1 className="text-xl font-semibold text-white">Login Kasir</h1>
         </div>
 
         <div className="p-8">

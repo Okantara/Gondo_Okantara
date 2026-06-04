@@ -128,7 +128,7 @@ export function UnifiedLoginPage({ mode }: UnifiedLoginPageProps) {
   const subtitle = isAdminMode
     ? "Silakan login untuk mengakses dashboard admin"
     : isKasirMode
-      ? "Silakan login untuk membuka menu kasir"
+      ? ""
       : "Silakan login untuk melanjutkan";
 
   return (
@@ -225,19 +225,6 @@ export function UnifiedLoginPage({ mode }: UnifiedLoginPageProps) {
                 : `Login ${isAdminMode ? "Admin" : isKasirMode ? "Kasir" : ""}`}
             </button>
           </form>
-
-          {/* FOOTER */}
-          <div className="mt-6 text-center text-sm text-gray-600">
-            <p className="text-gray-600">
-              Belum punya akun?{" "}
-              <a
-                href="#"
-                className="font-medium text-blue-600 hover:text-blue-500"
-              >
-                Hubungi admin
-              </a>
-            </p>
-          </div>
         </div>
       </div>
     </div>

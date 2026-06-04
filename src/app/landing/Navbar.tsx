@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import { Menu, X, Store, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { supabase } from "../../lib/supabase";
 
 import LogoPakGondo from "../../assets/Logo_Pak_Gondo.png";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string>(LogoPakGondo);
 
   const navigate = useNavigate();
   const { user, profile, signOut } = useAuth();
@@ -18,23 +20,37 @@ export function Navbar() {
     };
 
     window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Tentukan path kasir berdasarkan login status
+  // AMBIL LOGO DARI DATABASE
+  useEffect(() => {
+    const fetchLogo = async () => {
+      const { data, error } = await supabase
+        .from("profile_data")
+        .select("logo")
+        .limit(1)
+        .single();
+
+      if (!error && data?.logo) {
+        setLogoUrl(data.logo);
+      } else {
+        setLogoUrl(LogoPakGondo);
+      }
+    };
+
+    fetchLogo();
+  }, []);
+
   const kasirPath =
     user && profile?.role === "kasir" ? "/kasir" : "/kasir/login";
 
   const menuItems = [
     { name: "Beranda", path: "/" },
     { name: "Katalog", path: "/katalog" },
-    { name: "Varian Abon", path: "/gallery" },
+    { name: "Varian Produk", path: "/gallery" },
     { name: "Mitra Kerja", path: "/mitra-kerja" },
     { name: "Gabung Mitra", path: "/gabung-mitra" },
-    { name: "Kasir", path: kasirPath, icon: true },
   ];
 
   const handleLogoClick = () => {
@@ -61,28 +77,13 @@ export function Navbar() {
       }`}
     >
       <div className="container mx-auto px-4 flex justify-between items-center">
-        {/* LOGO */}
-        <button onClick={handleLogoClick} className="cursor-pointer">
-          <img
-            src={LogoPakGondo}
-            alt="Pak Gondo Logo"
-            className="h-10 object-contain"
-          />
-        </button>
-
-        {/* DESKTOP MENU */}
-        <div className="hidden md:flex items-center gap-6 font-medium text-black">
-          {menuItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className="hover:text-orange-500 transition-colors"
-            >
-              {item.icon ? <Store size={22} /> : item.name}
-            </Link>
-          ))}
-
-          {/* LOGOUT BUTTON - Hanya tampil jika user login */}
+        <div className="flex items-center gap-3">
+          <Link
+            to={kasirPath}
+            className="flex items-center gap-2 hover:text-orange-500 transition-colors"
+          >
+            <Store size={22} />
+          </Link>
           {user && profile && (
             <button
               onClick={handleLogout}
@@ -93,6 +94,24 @@ export function Navbar() {
               <span className="text-sm">Logout</span>
             </button>
           )}
+
+          {/* LOGO */}
+          <button onClick={handleLogoClick} className="cursor-pointer">
+            <img src={logoUrl} alt="Logo" className="h-10 object-contain" />
+          </button>
+        </div>
+
+        {/* DESKTOP MENU */}
+        <div className="hidden md:flex items-center gap-6 font-medium text-black">
+          {menuItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className="hover:text-orange-500 transition-colors"
+            >
+              {item.name}
+            </Link>
+          ))}
         </div>
 
         {/* MOBILE BUTTON */}
@@ -107,6 +126,15 @@ export function Navbar() {
       {/* MOBILE MENU */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white shadow-md px-4 py-4 flex flex-col gap-4">
+          <Link
+            to={kasirPath}
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="flex items-center gap-2 hover:text-orange-500 transition-colors"
+          >
+            <Store size={22} />
+            <span>Kasir</span>
+          </Link>
+
           {menuItems.map((item) => (
             <Link
               key={item.path}
@@ -114,11 +142,10 @@ export function Navbar() {
               onClick={() => setIsMobileMenuOpen(false)}
               className="hover:text-orange-500 transition-colors"
             >
-              {item.icon ? <Store size={22} /> : item.name}
+              {item.name}
             </Link>
           ))}
 
-          {/* LOGOUT BUTTON - Hanya tampil jika user login */}
           {user && profile && (
             <button
               onClick={handleLogout}

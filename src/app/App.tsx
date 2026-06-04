@@ -12,7 +12,6 @@ import { FormKemitraan } from "./landing/GabungMitra";
 import { Order } from "./Kasir/Order";
 import { KasirDashboard } from "./Kasir/KasirDashboard";
 import { KasirLayout } from "./Kasir/KasirLayout";
-import { PasswordManagementKasir } from "./Kasir/PasswordManagementKasir";
 
 // ADMIN
 import { DashboardHome } from "./admin/DashboardHome";
@@ -72,7 +71,6 @@ export default function App() {
               <Route path="/kasir" element={<KasirLayout />}>
                 <Route index element={<KasirDashboard />} />
                 <Route path="order" element={<Order />} />
-                <Route path="password" element={<PasswordManagementKasir />} />
               </Route>
             </Route>
 
