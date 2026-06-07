@@ -12,6 +12,8 @@ import {
   LogOut,
   CreditCard,
   Lock,
+  Users,
+  MapPin,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -23,6 +25,7 @@ const navItems = [
   { path: "/admin/Galerry", icon: ShoppingBasket, label: "Varian Abon" },
   { path: "/admin/MitraPage", icon: Handshake, label: "Data Mitra" },
   { path: "/admin/mitra-management", icon: Handshake, label: "Kelola Mitra" },
+  { path: "/admin/kasir-tempat", icon: Users, label: "Kasir & Tempat Jual" },
   { path: "/admin/profile", icon: User, label: "Profil Toko" },
   {
     path: "/admin/keunggulan-produk",

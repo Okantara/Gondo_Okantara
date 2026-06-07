@@ -12,6 +12,11 @@ import {
 import { supabase } from "../../lib/supabase";
 import { VisitorStatsComponent } from "./VisitorStats";
 
+interface PembelianRecord {
+  total: number;
+  created_at: string;
+}
+
 export function DashboardHome() {
   const [counts, setCounts] = useState({
     slider: 0,
@@ -71,7 +76,7 @@ export function DashboardHome() {
         mitra: mitraResult.count || 0,
       });
 
-      const pembelianData = pembelianResult.data || [];
+      const pembelianData = (pembelianResult.data || []) as PembelianRecord[];
       const now = new Date();
 
       const startToday = new Date(now);
@@ -85,16 +90,31 @@ export function DashboardHome() {
       startMonth.setHours(0, 0, 0, 0);
 
       const totalToday = pembelianData
-        .filter((item) => new Date(item.created_at) >= startToday)
-        .reduce((sum, item) => sum + Number(item.total || 0), 0);
+        .filter(
+          (item: PembelianRecord) => new Date(item.created_at) >= startToday,
+        )
+        .reduce(
+          (sum: number, item: PembelianRecord) => sum + Number(item.total || 0),
+          0,
+        );
 
       const totalWeek = pembelianData
-        .filter((item) => new Date(item.created_at) >= startWeek)
-        .reduce((sum, item) => sum + Number(item.total || 0), 0);
+        .filter(
+          (item: PembelianRecord) => new Date(item.created_at) >= startWeek,
+        )
+        .reduce(
+          (sum: number, item: PembelianRecord) => sum + Number(item.total || 0),
+          0,
+        );
 
       const totalMonth = pembelianData
-        .filter((item) => new Date(item.created_at) >= startMonth)
-        .reduce((sum, item) => sum + Number(item.total || 0), 0);
+        .filter(
+          (item: PembelianRecord) => new Date(item.created_at) >= startMonth,
+        )
+        .reduce(
+          (sum: number, item: PembelianRecord) => sum + Number(item.total || 0),
+          0,
+        );
 
       setSalesStats({
         today: totalToday,

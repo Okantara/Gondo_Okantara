@@ -24,6 +24,7 @@ import { MitraPage } from "./admin/MitraPage";
 import { SlidesPage } from "./admin/SlidesPage";
 import { MetodePembayaranPage } from "./admin/PembayaranPage";
 import { PasswordManagementPage } from "./admin/PasswordManagementPage";
+import { KasirTempatPage } from "./admin/KasirTempatPage";
 
 // AUTH
 import { UnifiedLoginPage } from "./auth/UnifiedLoginPage";
@@ -99,6 +100,7 @@ export default function App() {
                   path="password-management"
                   element={<PasswordManagementPage />}
                 />
+                <Route path="kasir-tempat" element={<KasirTempatPage />} />
               </Route>
             </Route>
           </Routes>

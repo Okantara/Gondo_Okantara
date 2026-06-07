@@ -24,13 +24,22 @@ interface OrderItem {
     gambar: string | null;
     nomor: string | null;
     atas_nama: string | null;
-  };
+  } | null;
 
-  nama_kasir?: string;
+  master_kasir?: {
+    nama_kasir: string;
+  } | null;
+
+  tempat_penjualan?: {
+    nama_tempat: string;
+  } | null;
 }
 
 export const cetakPDF = async (order: OrderItem) => {
   const metode = order.metode_pembayaran;
+
+  const namaKasir = order.master_kasir?.nama_kasir || "Kasir";
+  const namaTempat = order.tempat_penjualan?.nama_tempat || "Tulungagung";
 
   const paymentImageUrl = metode?.gambar ? getImageUrl(metode.gambar) : "";
 
@@ -43,7 +52,6 @@ export const cetakPDF = async (order: OrderItem) => {
   const total = Number(order.total).toLocaleString("id-ID");
   const namaFile = `Pesanan-${order.id}-${order.nama}-${tanggal}`;
 
-  // 🔥 AMBIL LOGO DARI DATABASE
   const { data } = await supabase
     .from("profile_data")
     .select("logo")
@@ -79,131 +87,164 @@ export const cetakPDF = async (order: OrderItem) => {
   <title>${namaFile}</title>
 
   <style>
-    *{
-      box-sizing:border-box;
+    * {
+      box-sizing: border-box;
     }
 
-    body{
+    body {
       font-family: Arial, sans-serif;
-      padding:20px;
-      color:#111;
+      padding: 20px;
+      color: #111;
     }
 
-    .logo{
-      text-align:center;
-      margin-bottom:25px;
+    .logo {
+      text-align: center;
+      margin-bottom: 25px;
     }
 
-    .logo img{
-      max-width:220px;
-      height:auto;
+    .logo img {
+      max-width: 220px;
+      height: auto;
     }
 
-    table{
-      width:100%;
-      border-collapse:collapse;
+    table {
+      width: 100%;
+      border-collapse: collapse;
     }
 
     th,
-    td{
-      padding:8px;
-      font-size:13px;
-      border:1px solid #ddd;
+    td {
+      padding: 8px;
+      font-size: 13px;
     }
 
-    .head{
-      background:#dc2626;
-      color:#fff;
+    .head {
+      background: #dc2626;
+      color: #fff;
     }
 
-    .right{
-      text-align:right;
+    .right {
+      text-align: right;
     }
 
-    .center{
-      text-align:center;
+    .center {
+      text-align: center;
     }
 
-    .info-table{
-      margin-bottom:20px;
+    .info-table {
+      margin-bottom: 20px;
     }
 
-    .product-table{
-      margin-bottom:30px;
+    .info-table td {
+      border: none;
+      padding: 4px 0;
+      vertical-align: top;
     }
 
-    .footer{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      margin-top:30px;
+    .info-label {
+      width: 140px;
+      font-weight: 600;
     }
 
-    .payment{
-      width:45%;
+    .info-separator {
+      width: 15px;
+      text-align: center;
     }
 
-    .signature{
-      width:45%;
-      text-align:center;
-      font-size:13px;
+    .info-value {
+      width: auto;
     }
 
-    .signature-name{
-      margin-top:60px;
-      font-weight:bold;
+    .product-table {
+      margin-bottom: 30px;
     }
 
-    @media print{
-      body{
-        padding:10px;
+    .product-table th,
+    .product-table td {
+      border: 1px solid #ddd;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-top: 30px;
+    }
+
+    .payment {
+      width: 45%;
+    }
+
+    .signature {
+      width: 45%;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .signature-name {
+      margin-top: 60px;
+      font-weight: bold;
+    }
+
+    @media print {
+      body {
+        padding: 10px;
       }
     }
   </style>
 </head>
 
 <body>
-
   <div class="logo">
     <img src="${logoImageUrl}" />
   </div>
 
-  <!-- INFORMASI PEMBELI -->
   <table class="info-table">
-
     <tr>
-      <td width="30%">Nota</td>
-      <td>PSN-${String(order.id).padStart(4, "0")}</td>
+      <td class="info-label">Nota</td>
+      <td class="info-separator">:</td>
+      <td class="info-value">
+        PSN-${String(order.id).padStart(4, "0")}
+      </td>
     </tr>
 
     <tr>
-      <td>Nama</td>
-      <td>${order.nama}</td>
+      <td class="info-label">Tanggal</td>
+      <td class="info-separator">:</td>
+      <td class="info-value">${tanggal}</td>
     </tr>
 
     <tr>
-      <td>No HP</td>
-      <td>${order.no_hp || "-"}</td>
+      <td class="info-label">Nama</td>
+      <td class="info-separator">:</td>
+      <td class="info-value">${order.nama}</td>
     </tr>
 
     <tr>
-      <td>Alamat</td>
-      <td>${order.alamat || "-"}</td>
+      <td class="info-label">No HP</td>
+      <td class="info-separator">:</td>
+      <td class="info-value">${order.no_hp || "-"}</td>
+    </tr>
+
+    <tr>
+      <td class="info-label">Alamat</td>
+      <td class="info-separator">:</td>
+      <td class="info-value">${order.alamat || "-"}</td>
     </tr>
 
     ${
       order.catatan
         ? `
-      <tr>
-        <td>Catatan</td>
-        <td>${order.catatan}</td>
-      </tr>
-    `
+        <tr>
+          <td class="info-label">Catatan</td>
+          <td class="info-separator">:</td>
+          <td class="info-value">${order.catatan}</td>
+        </tr>
+      `
         : ""
     }
   </table>
 
-  <!-- DETAIL PRODUK -->
   <table class="product-table">
     <thead>
       <tr class="head">
@@ -221,7 +262,6 @@ export const cetakPDF = async (order: OrderItem) => {
         <td colspan="3" class="right">
           <b>TOTAL</b>
         </td>
-
         <td class="right">
           <b>Rp ${total}</b>
         </td>
@@ -229,9 +269,7 @@ export const cetakPDF = async (order: OrderItem) => {
     </tbody>
   </table>
 
-  <!-- FOOTER -->
   <div class="footer">
-
     ${
       metode
         ? `
@@ -248,10 +286,7 @@ export const cetakPDF = async (order: OrderItem) => {
               ? `
             <tr>
               <td colspan="2" class="center">
-                <img
-                  src="${paymentImageUrl}"
-                  width="160"
-                />
+                <img src="${paymentImageUrl}" width="160" />
               </td>
             </tr>
           `
@@ -261,6 +296,10 @@ export const cetakPDF = async (order: OrderItem) => {
           ${
             metode.nomor
               ? `
+            <tr>
+              <td>Nomor</td>
+              <td>${metode.nomor}</td>
+            </tr>
           `
               : ""
           }
@@ -282,22 +321,27 @@ export const cetakPDF = async (order: OrderItem) => {
     }
 
     <div class="signature">
-      <div>Tulungagung, ${tanggal}</div>
+      <div>${namaTempat}, ${tanggal}</div>
       <div style="margin-top:10px;">Kasir</div>
 
       <div class="signature-name">
-        ${order.nama_kasir || "Kasir"}
+        ${namaKasir}
       </div>
     </div>
-
   </div>
 
   <script>
     window.onload = () => {
-      window.print();
-    };
-  </script>
+    window.print();
 
+    // setTimeout(() => {
+    //   window.open(
+    //     "https://wa.me/628123456789?text=Terima%20Kasih",
+    //     "_blank"
+    //   );
+    // }, 1000);
+  };
+  </script>
 </body>
 </html>
 `);

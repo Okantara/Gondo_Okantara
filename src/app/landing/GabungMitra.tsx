@@ -39,6 +39,26 @@ export function FormKemitraan() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
+  const kirimWhatsApp = () => {
+    const pesan = `
+Halo Admin Okantara,
+
+Saya ingin bergabung sebagai mitra.
+
+Nama: ${formData.namaLengkap}
+WhatsApp: ${formData.whatsapp}
+Alamat: ${formData.alamat}
+Email: ${formData.email}
+
+Terima kasih.
+    `.trim();
+
+    window.open(
+      `https://wa.me/6281230040066?text=${encodeURIComponent(pesan)}`,
+      "_blank",
+    );
+  };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -87,7 +107,9 @@ export function FormKemitraan() {
       return;
     }
 
-    alert("Pendaftaran kemitraan berhasil dikirim!");
+    kirimWhatsApp();
+
+    alert("Pendaftaran berhasil dikirim!");
 
     setFormData({
       namaLengkap: "",
@@ -103,7 +125,7 @@ export function FormKemitraan() {
       className="min-h-screen bg-gray-100 flex items-center justify-center px-4 pt-20 pb-10"
     >
       <div className="w-full max-w-xl bg-white shadow-lg rounded-2xl p-8">
-        <h2 className="text-3xl font-bold text-gray-800 text-center">
+        <h2 className="text-3xl font-bold text-gray-800 text-center mb-6">
           Isi Data
         </h2>
 

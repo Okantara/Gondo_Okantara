@@ -50,6 +50,70 @@ export function KasirDashboard() {
     return `Rp ${Number(value || 0).toLocaleString("id-ID")}`;
   };
 
+  const formatNomorWA = (noHp: string | null) => {
+    if (!noHp) return "";
+
+    let nomor = noHp.replace(/\D/g, "");
+
+    if (nomor.startsWith("0")) {
+      nomor = "62" + nomor.substring(1);
+    }
+
+    if (!nomor.startsWith("62")) {
+      nomor = "62" + nomor;
+    }
+
+    return nomor;
+  };
+
+  const kirimNotaWA = (order: OrderItem) => {
+    const nomorWA = formatNomorWA(order.no_hp);
+
+    if (!nomorWA) {
+      alert("Nomor HP pembeli tidak tersedia.");
+      return;
+    }
+
+    const tanggal = new Date(order.created_at).toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
+
+    const daftarProduk = order.pembelian_items
+      .map(
+        (item, index) =>
+          `${index + 1}. ${item.nama_produk} x${item.qty} - ${formatRupiah(
+            item.subtotal,
+          )}`,
+      )
+      .join("\n");
+
+    const pesan = `
+Halo ${order.nama},
+
+Berikut nota pembelian Anda:
+
+Kode Pesanan: #${order.id}
+Tanggal: ${tanggal}
+Nama: ${order.nama}
+No HP: ${order.no_hp || "-"}
+Alamat: ${order.alamat || "-"}
+
+Produk:
+${daftarProduk}
+
+Total: ${formatRupiah(order.total)}
+Metode Pembayaran: ${order.metode_pembayaran?.nama || "-"}
+
+Terima kasih.
+    `.trim();
+
+    const url = `https://wa.me/${nomorWA}?text=${encodeURIComponent(pesan)}`;
+
+    window.open(url, "_blank");
+  };
+
   const hitungStatistikPenjualan = (ordersData: OrderItem[]) => {
     const now = new Date();
 
@@ -63,21 +127,23 @@ export function KasirDashboard() {
     const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     startMonth.setHours(0, 0, 0, 0);
 
-    const totalTodayValue = ordersData
-      .filter((item) => new Date(item.created_at) >= startToday)
-      .reduce((sum, item) => sum + Number(item.total || 0), 0);
+    setTotalToday(
+      ordersData
+        .filter((item) => new Date(item.created_at) >= startToday)
+        .reduce((sum, item) => sum + Number(item.total || 0), 0),
+    );
 
-    const totalWeekValue = ordersData
-      .filter((item) => new Date(item.created_at) >= startWeek)
-      .reduce((sum, item) => sum + Number(item.total || 0), 0);
+    setTotalWeek(
+      ordersData
+        .filter((item) => new Date(item.created_at) >= startWeek)
+        .reduce((sum, item) => sum + Number(item.total || 0), 0),
+    );
 
-    const totalMonthValue = ordersData
-      .filter((item) => new Date(item.created_at) >= startMonth)
-      .reduce((sum, item) => sum + Number(item.total || 0), 0);
-
-    setTotalToday(totalTodayValue);
-    setTotalWeek(totalWeekValue);
-    setTotalMonth(totalMonthValue);
+    setTotalMonth(
+      ordersData
+        .filter((item) => new Date(item.created_at) >= startMonth)
+        .reduce((sum, item) => sum + Number(item.total || 0), 0),
+    );
   };
 
   const fetchPembelian = async () => {
@@ -167,8 +233,8 @@ export function KasirDashboard() {
             <p className="text-gray-500">Belum ada pesanan</p>
           ) : (
             <div className="space-y-2 overflow-x-auto">
-              <div className="min-w-[850px]">
-                <div className="grid grid-cols-[2fr_1.2fr_1.5fr_1.2fr_auto] items-center gap-4 rounded-xl bg-gray-100 px-5 py-3 text-sm font-semibold text-gray-700">
+              <div className="min-w-[950px]">
+                <div className="grid grid-cols-[2fr_1.2fr_1.5fr_1.2fr_220px] items-center gap-4 rounded-xl bg-gray-100 px-5 py-3 text-sm font-semibold text-gray-700">
                   <div>Nama</div>
                   <div>Tanggal</div>
                   <div>No HP</div>
@@ -180,7 +246,7 @@ export function KasirDashboard() {
                   {orders.map((order) => (
                     <div
                       key={order.id}
-                      className="grid grid-cols-[2fr_1.2fr_1.5fr_1.2fr_auto] items-center gap-4 rounded-xl border border-gray-200 bg-white px-5 py-3 shadow-sm transition hover:shadow-md"
+                      className="grid grid-cols-[2fr_1.2fr_1.5fr_1.2fr_220px] items-center gap-4 rounded-xl border border-gray-200 bg-white px-5 py-3 shadow-sm transition hover:shadow-md"
                     >
                       <div className="font-medium text-gray-800">
                         {order.nama}
@@ -203,12 +269,20 @@ export function KasirDashboard() {
                         {formatRupiah(order.total)}
                       </div>
 
-                      <div className="flex justify-center">
+                      <div className="flex justify-center gap-2">
                         <button
                           onClick={() => cetakPDF(order)}
                           className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
                         >
                           Cetak
+                        </button>
+
+                        <button
+                          onClick={() => kirimNotaWA(order)}
+                          disabled={!order.no_hp}
+                          className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          Kirim WA
                         </button>
                       </div>
                     </div>

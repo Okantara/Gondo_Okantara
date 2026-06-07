@@ -414,7 +414,7 @@ export function KatalogPage() {
       </div>
 
       {/* GRID */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         {isLoading && filteredImages.length === 0 ? (
           <div className="col-span-full text-center py-12">
             <p className="text-gray-500">Loading...</p>
@@ -427,9 +427,10 @@ export function KatalogPage() {
           filteredImages.map((image) => (
             <div
               key={image.id}
-              className="bg-white rounded-xl shadow overflow-hidden hover:shadow-lg transition"
+              className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-lg transition"
             >
-              <div className="relative group aspect-square bg-gray-100">
+              {/* IMAGE */}
+              <div className="h-48 sm:h-44 lg:h-36 xl:h-40 bg-gray-100 overflow-hidden">
                 <img
                   src={image.image_url}
                   alt={image.judul}
@@ -440,44 +441,56 @@ export function KatalogPage() {
                       "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23f0f0f0' width='100' height='100'/%3E%3Ctext x='50' y='50' font-size='14' fill='%23999' text-anchor='middle' dy='.3em'%3EImage Error%3C/text%3E%3C/svg%3E";
                   }}
                 />
+              </div>
 
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-3 transition">
-                  <button
-                    onClick={() => setSelectedImage(image)}
-                    className="bg-white p-2 rounded-full hover:bg-gray-100 transition"
-                    title="Zoom"
-                  >
-                    <ZoomIn size={20} />
-                  </button>
+              {/* CONTENT */}
+              <div className="p-4">
+                <h3 className="font-bold text-gray-900 line-clamp-1">
+                  {image.judul}
+                </h3>
 
+                <p className="text-sm text-gray-500 mt-2 line-clamp-2 min-h-[40px]">
+                  {image.deskripsi}
+                </p>
+
+                <div className="mt-3">
+                  <p className="text-lg font-bold text-red-600">
+                    Rp {(image.harga || 0).toLocaleString("id-ID")}
+                  </p>
+
+                  <span className="inline-block mt-2 px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                    {image.category}
+                  </span>
+                </div>
+
+                {/* LIHAT DETAIL */}
+                <button
+                  onClick={() => setSelectedImage(image)}
+                  className="w-full mt-4 flex items-center justify-center gap-2 bg-blue-600 text-white py-2.5 rounded-xl hover:bg-blue-700 transition text-sm font-medium"
+                >
+                  <ZoomIn size={17} />
+                  Lihat Detail
+                </button>
+
+                {/* ACTION BUTTONS */}
+                <div className="grid grid-cols-2 gap-2 mt-3">
                   <button
                     onClick={() => handleEdit(image)}
-                    className="bg-white p-2 rounded-full text-blue-600 hover:bg-gray-100 transition"
-                    title="Edit"
+                    className="flex items-center justify-center gap-2 py-2.5 rounded-xl border border-blue-200 text-blue-600 hover:bg-blue-50 transition text-sm font-medium"
                   >
-                    <Pencil size={20} />
+                    <Pencil size={16} />
+                    Edit
                   </button>
 
                   <button
                     onClick={() => handleDelete(image.id)}
                     disabled={isLoading}
-                    className="bg-white p-2 rounded-full text-red-600 hover:bg-gray-100 disabled:opacity-50 transition"
-                    title="Hapus"
+                    className="flex items-center justify-center gap-2 py-2.5 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-50 transition text-sm font-medium"
                   >
-                    <Trash2 size={20} />
+                    <Trash2 size={16} />
+                    Hapus
                   </button>
                 </div>
-              </div>
-
-              <div className="p-3">
-                <h3 className="font-semibold truncate">{image.judul}</h3>
-                <p className="text-sm text-gray-500 line-clamp-2">
-                  {image.deskripsi}
-                </p>
-                <p className="text-sm font-bold text-red-600 mt-2">
-                  Rp {(image.harga || 0).toLocaleString("id-ID")}
-                </p>
-                <span className="text-xs text-gray-400">{image.category}</span>
               </div>
             </div>
           ))

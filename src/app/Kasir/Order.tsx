@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
-import { Wallet } from "lucide-react";
+import { Wallet, UserRound } from "lucide-react";
 import { getImageUrl } from "../../lib/imageUtils";
 
 interface ProductDB {
@@ -26,11 +26,29 @@ interface MetodePembayaran {
   order: number;
 }
 
-export function Order() {
+interface MasterKasir {
+  id: number;
+  nama_kasir: string;
+  status: boolean;
+}
+
+interface TempatPenjualan {
+  id: number;
+  nama_tempat: string;
+  status: boolean;
+}
+
+interface OrderProps {
+  onSuccess?: () => void;
+}
+
+export function Order({ onSuccess }: OrderProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [metodePembayaran, setMetodePembayaran] = useState<MetodePembayaran[]>(
     [],
   );
+  const [masterKasir, setMasterKasir] = useState<MasterKasir[]>([]);
+  const [tempatPenjualan, setTempatPenjualan] = useState<TempatPenjualan[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [formData, setFormData] = useState({
@@ -39,11 +57,15 @@ export function Order() {
     alamat: "",
     catatan: "",
     metodePembayaranId: "",
+    namaKasirId: "",
+    tempatPenjualanId: "",
   });
 
   useEffect(() => {
     fetchProducts();
     fetchMetodePembayaran();
+    fetchMasterKasir();
+    fetchTempatPenjualan();
   }, []);
 
   const fetchProducts = async () => {
@@ -93,6 +115,50 @@ export function Order() {
     }
   };
 
+  const fetchMasterKasir = async () => {
+    const { data, error } = await supabase
+      .from("master_kasir")
+      .select("*")
+      .eq("status", true)
+      .order("nama_kasir", { ascending: true });
+
+    if (error) {
+      console.error("Gagal mengambil master kasir:", error);
+      return;
+    }
+
+    setMasterKasir(data || []);
+
+    if (data && data.length > 0) {
+      setFormData((prev) => ({
+        ...prev,
+        namaKasirId: String(data[0].id),
+      }));
+    }
+  };
+
+  const fetchTempatPenjualan = async () => {
+    const { data, error } = await supabase
+      .from("tempat_penjualan")
+      .select("*")
+      .eq("status", true)
+      .order("nama_tempat", { ascending: true });
+
+    if (error) {
+      console.error("Gagal mengambil tempat penjualan:", error);
+      return;
+    }
+
+    setTempatPenjualan(data || []);
+
+    if (data && data.length > 0) {
+      setFormData((prev) => ({
+        ...prev,
+        tempatPenjualanId: String(data[0].id),
+      }));
+    }
+  };
+
   const updateQuantity = (id: number, type: "plus" | "minus") => {
     setProducts((prev) =>
       prev.map((item) =>
@@ -110,7 +176,9 @@ export function Order() {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -133,8 +201,13 @@ export function Order() {
       return;
     }
 
-    if (selectedProducts.length === 0) {
-      alert("Pilih produk terlebih dahulu");
+    if (!formData.namaKasirId) {
+      alert("Pilih nama kasir");
+      return;
+    }
+
+    if (!formData.tempatPenjualanId) {
+      alert("Pilih tempat penjualan");
       return;
     }
 
@@ -142,6 +215,15 @@ export function Order() {
       alert("Pilih metode pembayaran");
       return;
     }
+
+    if (selectedProducts.length === 0) {
+      alert("Pilih produk terlebih dahulu");
+      return;
+    }
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     const { data: pembelian, error: pembelianError } = await supabase
       .from("pembelian")
@@ -151,6 +233,9 @@ export function Order() {
         alamat: formData.alamat,
         catatan: formData.catatan,
         metode_pembayaran_id: Number(formData.metodePembayaranId),
+        nama_kasir_id: Number(formData.namaKasirId),
+        tempat_penjualan_id: Number(formData.tempatPenjualanId),
+        created_by: user?.id || null,
         total: totalHarga,
       })
       .select()
@@ -191,6 +276,10 @@ export function Order() {
       metodePembayaranId: metodePembayaran[0]
         ? String(metodePembayaran[0].id)
         : "",
+      namaKasirId: masterKasir[0] ? String(masterKasir[0].id) : "",
+      tempatPenjualanId: tempatPenjualan[0]
+        ? String(tempatPenjualan[0].id)
+        : "",
     });
 
     setProducts((prev) =>
@@ -199,6 +288,8 @@ export function Order() {
         quantity: 0,
       })),
     );
+
+    onSuccess?.();
   };
 
   return (
@@ -211,7 +302,7 @@ export function Order() {
             name="nama"
             value={formData.nama}
             onChange={handleChange}
-            placeholder="Nama"
+            placeholder="Nama Pemesan"
             className="border rounded-2xl px-4 py-3"
           />
 
@@ -238,6 +329,59 @@ export function Order() {
             placeholder="Catatan"
             className="md:col-span-2 border rounded-2xl px-4 py-3"
           />
+        </div>
+
+        <div className="mt-6">
+          <h3 className="font-bold mb-3 flex items-center gap-2">
+            <UserRound className="text-red-600" size={18} />
+            Kasir & Tempat Penjualan
+          </h3>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Kasir */}
+            <div className="rounded-2xl border bg-white p-4 space-y-2">
+              <div className="flex items-center gap-2 font-medium">
+                <UserRound className="text-red-600" size={20} />
+                <span>Pilih Kasir</span>
+              </div>
+
+              <select
+                name="namaKasirId"
+                value={formData.namaKasirId}
+                onChange={handleChange}
+                className="w-full border rounded-2xl px-4 py-3 bg-white"
+              >
+                <option value="">Pilih Nama Kasir</option>
+                {masterKasir.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.nama_kasir}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Tempat Penjualan */}
+            <div className="rounded-2xl border bg-white p-4 space-y-2">
+              <div className="flex items-center gap-2 font-medium">
+                <UserRound className="text-red-600" size={20} />
+                <span>Tempat Penjualan</span>
+              </div>
+
+              <select
+                name="tempatPenjualanId"
+                value={formData.tempatPenjualanId}
+                onChange={handleChange}
+                className="w-full border rounded-2xl px-4 py-3 bg-white"
+              >
+                <option value="">Pilih Tempat Penjualan</option>
+                {tempatPenjualan.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.nama_tempat}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
 
         <div className="mt-6">
@@ -308,7 +452,6 @@ export function Order() {
         <p className="text-center">Loading...</p>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Produk */}
           <div className="lg:col-span-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {products.map((product) => (
@@ -363,7 +506,7 @@ export function Order() {
               ))}
             </div>
           </div>
-          {/* Ringkasan Pesanan */}
+
           <div className="lg:col-span-1">
             <div className="sticky top-4 bg-white border rounded-2xl p-4 shadow-sm">
               <h3 className="font-bold text-lg mb-4">Ringkasan Pesanan</h3>
