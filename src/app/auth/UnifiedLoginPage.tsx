@@ -29,7 +29,7 @@ export function UnifiedLoginPage({ mode }: UnifiedLoginPageProps) {
       }
       // Jika mode adalah kasir dan user adalah kasir, redirect ke kasir
       else if (mode === "kasir" && profile.role === "kasir") {
-        navigate("/kasir", { replace: true });
+        navigate("/kasir/order", { replace: true });
       }
       // Jika mode adalah auto, redirect ke dashboard sesuai role
       else if (mode === "auto") {

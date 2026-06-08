@@ -170,11 +170,8 @@ export function PasswordManagementPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Manajemen Password</h1>
-        <p className="text-gray-600 mt-2">
-          Kelola password akun admin dan kasir
-        </p>
+      <div className="mb-8 mt-10">
+        <h1 className="text-3xl font-bold text-gray-900">User Password</h1>
       </div>
 
       {error && (

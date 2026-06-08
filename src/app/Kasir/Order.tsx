@@ -446,7 +446,7 @@ Terima kasih.`;
   return (
     <div className="px-3 py-4 pb-28 md:p-8">
       <div className="mb-5 rounded-3xl border bg-gray-50 p-4 md:p-6">
-        <h2 className="mb-5 text-xl font-bold">NOTA</h2>
+        <h2 className="mb-5 text-xl font-bold text-center">NOTA</h2>
 
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
           <input

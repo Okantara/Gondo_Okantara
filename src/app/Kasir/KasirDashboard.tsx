@@ -83,7 +83,7 @@ export function KasirDashboard() {
     const daftarProduk = order.pembelian_items
       .map(
         (item, index) =>
-          `${index + 1}. ${item.nama_produk} x${item.qty} - ${formatRupiah(
+          `*${index + 1}*. *${item.nama_produk}* ${formatRupiah(item.harga)} x ${item.qty} = ${formatRupiah(
             item.subtotal,
           )}`,
       )
@@ -193,13 +193,13 @@ Terima kasih.
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <KasirNavbar title="Kasir" />
-
-      <div className="pt-24 p-6">
+    <div className="">
+      <div className="p-6">
         <div className="max-w-6xl mx-auto rounded-3xl bg-white p-6 shadow-lg">
           <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">Arsip Nota</h1>
+            <h1 className="text-2xl font-bold text-gray-900 text-center">
+              Arsip Nota
+            </h1>
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <div className="min-w-[160px] rounded-xl border border-green-200 bg-green-50 px-4 py-3">
