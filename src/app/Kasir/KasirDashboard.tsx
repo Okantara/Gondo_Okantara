@@ -40,7 +40,7 @@ export function KasirDashboard() {
 
   const [totalToday, setTotalToday] = useState(0);
   const [totalWeek, setTotalWeek] = useState(0);
-  const [totalMonth, setTotalMonth] = useState(0);
+  // const [totalMonth, setTotalMonth] = useState(0);
 
   useEffect(() => {
     fetchPembelian();
@@ -139,11 +139,11 @@ Terima kasih.
         .reduce((sum, item) => sum + Number(item.total || 0), 0),
     );
 
-    setTotalMonth(
-      ordersData
-        .filter((item) => new Date(item.created_at) >= startMonth)
-        .reduce((sum, item) => sum + Number(item.total || 0), 0),
-    );
+    // setTotalMonth(
+    //   ordersData
+    //     .filter((item) => new Date(item.created_at) >= startMonth)
+    //     .reduce((sum, item) => sum + Number(item.total || 0), 0),
+    // );
   };
 
   const fetchPembelian = async () => {
@@ -186,7 +186,7 @@ Terima kasih.
       setOrders([]);
       setTotalToday(0);
       setTotalWeek(0);
-      setTotalMonth(0);
+      // setTotalMonth(0);
     } finally {
       setLoading(false);
     }
@@ -218,7 +218,7 @@ Terima kasih.
                 </p>
               </div>
 
-              <div className="min-w-[160px] rounded-xl border border-purple-200 bg-purple-50 px-4 py-3">
+              {/* <div className="min-w-[160px] rounded-xl border border-purple-200 bg-purple-50 px-4 py-3">
                 <p className="text-sm text-gray-500">
                   {" "}
                   Bulan{" "}
@@ -230,7 +230,7 @@ Terima kasih.
                 <p className="text-xl font-bold text-purple-700">
                   {formatRupiah(totalMonth)}
                 </p>
-              </div>
+              </div> */}
             </div>
           </div>
 

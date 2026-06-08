@@ -263,13 +263,10 @@ export function KasirTempatPage() {
 
   return (
     <div>
-      <div className="mb-8">
+      <div className="mb-8 mt-10">
         <h1 className="text-3xl font-bold text-gray-900">
           Manajemen Kasir & Tempat Penjualan
         </h1>
-        <p className="mt-2 text-gray-600">
-          Kelola data kasir dan lokasi penjualan Anda
-        </p>
       </div>
 
       <Tabs defaultValue="kasir" className="w-full">
@@ -306,7 +303,7 @@ export function KasirTempatPage() {
               <p className="text-gray-500">Belum ada data kasir</p>
             </div>
           ) : (
-            <div className="rounded-lg bg-white shadow overflow-hidden">
+            <div className="rounded-lg bg-white shadow overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50 border-b">
                   <tr>
@@ -471,8 +468,8 @@ export function KasirTempatPage() {
               <p className="text-gray-500">Belum ada data tempat penjualan</p>
             </div>
           ) : (
-            <div className="rounded-lg bg-white shadow overflow-hidden">
-              <table className="w-full">
+            <div className="rounded-lg bg-white shadow overflow-x-auto">
+              <table className="w-full min-w-[700px]">
                 <thead className="bg-gray-50 border-b">
                   <tr>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
