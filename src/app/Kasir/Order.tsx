@@ -221,10 +221,6 @@ export function Order({ onSuccess }: OrderProps) {
       return;
     }
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
     const { data: pembelian, error: pembelianError } = await supabase
       .from("pembelian")
       .insert({
@@ -235,7 +231,6 @@ export function Order({ onSuccess }: OrderProps) {
         metode_pembayaran_id: Number(formData.metodePembayaranId),
         nama_kasir_id: Number(formData.namaKasirId),
         tempat_penjualan_id: Number(formData.tempatPenjualanId),
-        created_by: user?.id || null,
         total: totalHarga,
       })
       .select()
@@ -295,14 +290,14 @@ export function Order({ onSuccess }: OrderProps) {
   return (
     <div className="p-6 md:p-8">
       <div className="bg-gray-50 border rounded-3xl p-6 mb-8">
-        <h2 className="text-xl font-bold mb-5">Data Pemesan</h2>
+        <h2 className="text-xl font-bold mb-5">NOTA</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input
             name="nama"
             value={formData.nama}
             onChange={handleChange}
-            placeholder="Nama Pemesan"
+            placeholder="Konsumen"
             className="border rounded-2xl px-4 py-3"
           />
 
@@ -332,17 +327,12 @@ export function Order({ onSuccess }: OrderProps) {
         </div>
 
         <div className="mt-6">
-          <h3 className="font-bold mb-3 flex items-center gap-2">
-            <UserRound className="text-red-600" size={18} />
-            Kasir & Tempat Penjualan
-          </h3>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {/* Kasir */}
             <div className="rounded-2xl border bg-white p-4 space-y-2">
               <div className="flex items-center gap-2 font-medium">
                 <UserRound className="text-red-600" size={20} />
-                <span>Pilih Kasir</span>
+                <span>Karyawan</span>
               </div>
 
               <select
@@ -364,7 +354,7 @@ export function Order({ onSuccess }: OrderProps) {
             <div className="rounded-2xl border bg-white p-4 space-y-2">
               <div className="flex items-center gap-2 font-medium">
                 <UserRound className="text-red-600" size={20} />
-                <span>Tempat Penjualan</span>
+                <span>Wilayah</span>
               </div>
 
               <select

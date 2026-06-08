@@ -22,10 +22,10 @@ const navItems = [
   { path: "/admin", icon: LayoutDashboard, label: "Dashboard" },
   { path: "/admin/slides", icon: ImagePlay, label: "Image Slides" },
   { path: "/admin/Katalog", icon: Image, label: "Katalog Produk" },
-  { path: "/admin/Galerry", icon: ShoppingBasket, label: "Varian Abon" },
+  { path: "/admin/Galerry", icon: ShoppingBasket, label: "Varian Produk" },
   { path: "/admin/MitraPage", icon: Handshake, label: "Data Mitra" },
   { path: "/admin/mitra-management", icon: Handshake, label: "Kelola Mitra" },
-  { path: "/admin/kasir-tempat", icon: Users, label: "Kasir & Tempat Jual" },
+  { path: "/admin/kasir-tempat", icon: Users, label: "Karyawan & Wilayah" },
   { path: "/admin/profile", icon: User, label: "Profil Toko" },
   {
     path: "/admin/keunggulan-produk",

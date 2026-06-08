@@ -31,6 +31,7 @@ export function DashboardHome() {
     month: 0,
   });
 
+  const [monthLabel, setMonthLabel] = useState("");
   const [loading, setLoading] = useState(true);
 
   const formatRupiah = (value: number) => {
@@ -89,6 +90,13 @@ export function DashboardHome() {
       const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
       startMonth.setHours(0, 0, 0, 0);
 
+      const bulanTahun = new Intl.DateTimeFormat("id-ID", {
+        month: "long",
+        year: "numeric",
+      }).format(startMonth);
+
+      setMonthLabel(bulanTahun.charAt(0).toUpperCase() + bulanTahun.slice(1));
+
       const totalToday = pembelianData
         .filter(
           (item: PembelianRecord) => new Date(item.created_at) >= startToday,
@@ -130,7 +138,7 @@ export function DashboardHome() {
 
   const stats = [
     {
-      title: "Image Slider",
+      title: "Gambar Slide",
       value: counts.slider,
       icon: ImagePlay,
       color: "bg-blue-500",
@@ -142,7 +150,7 @@ export function DashboardHome() {
       color: "bg-green-500",
     },
     {
-      title: "Varian Abon",
+      title: "Varian",
       value: counts.varian,
       icon: Image,
       color: "bg-purple-500",
@@ -169,7 +177,7 @@ export function DashboardHome() {
       color: "bg-indigo-500",
     },
     {
-      title: "Penjualan Bulan Ini",
+      title: `Penjualan ${monthLabel}`,
       value: salesStats.month,
       icon: CalendarRange,
       color: "bg-emerald-500",

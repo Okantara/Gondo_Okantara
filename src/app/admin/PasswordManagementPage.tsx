@@ -217,10 +217,10 @@ export function PasswordManagementPage() {
             >
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <p className="font-semibold text-gray-900">{account.email}</p>
+                  <p className="font-semibold text-gray-900">{account.role}</p>
 
                   <p className="text-sm text-gray-600 mt-1">
-                    Role:{" "}
+                    User:{" "}
                     <span
                       className={`font-medium ${
                         account.role === "admin"

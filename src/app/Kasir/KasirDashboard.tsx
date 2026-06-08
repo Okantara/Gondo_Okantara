@@ -194,7 +194,7 @@ Terima kasih.
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <KasirNavbar title="Kasir Dashboard" />
+      <KasirNavbar title="Kasir" />
 
       <div className="pt-24 p-6">
         <div className="max-w-6xl mx-auto rounded-3xl bg-white p-6 shadow-lg">
@@ -219,7 +219,14 @@ Terima kasih.
               </div>
 
               <div className="min-w-[160px] rounded-xl border border-purple-200 bg-purple-50 px-4 py-3">
-                <p className="text-xs font-medium text-purple-600">Bulan Ini</p>
+                <p className="text-sm text-gray-500">
+                  {" "}
+                  Bulan{" "}
+                  {new Intl.DateTimeFormat("id-ID", {
+                    month: "long",
+                    year: "numeric",
+                  }).format(new Date())}
+                </p>
                 <p className="text-xl font-bold text-purple-700">
                   {formatRupiah(totalMonth)}
                 </p>
