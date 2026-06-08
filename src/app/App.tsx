@@ -25,6 +25,8 @@ import { SlidesPage } from "./admin/SlidesPage";
 import { MetodePembayaranPage } from "./admin/PembayaranPage";
 import { PasswordManagementPage } from "./admin/PasswordManagementPage";
 import { KasirTempatPage } from "./admin/KasirTempatPage";
+import { ArsipNotaPage } from "./admin/ArsipNotaPage";
+import { RekapPenjualanPage } from "./admin/RekapPenjualanPage";
 
 // AUTH
 import { UnifiedLoginPage } from "./auth/UnifiedLoginPage";
@@ -95,6 +97,11 @@ export default function App() {
                 <Route
                   path="metode-pembayaran"
                   element={<MetodePembayaranPage />}
+                />
+                <Route path="arsip-nota" element={<ArsipNotaPage />} />
+                <Route
+                  path="rekap-penjualan"
+                  element={<RekapPenjualanPage />}
                 />
                 <Route
                   path="password-management"

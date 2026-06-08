@@ -13,7 +13,8 @@ import {
   CreditCard,
   Lock,
   Users,
-  MapPin,
+  FileText,
+  BarChart3,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -36,6 +37,16 @@ const navItems = [
     path: "/admin/metode-pembayaran",
     icon: CreditCard,
     label: "Metode Pembayaran",
+  },
+  {
+    path: "/admin/arsip-nota",
+    icon: FileText,
+    label: "Arsip Nota Penjualan",
+  },
+  {
+    path: "/admin/rekap-penjualan",
+    icon: BarChart3,
+    label: "Rekap Penjualan",
   },
   {
     path: "/admin/password-management",
