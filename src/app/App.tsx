@@ -28,6 +28,12 @@ import { KasirTempatPage } from "./admin/KasirTempatPage";
 import { ArsipNotaPage } from "./admin/ArsipNotaPage";
 import { RekapPenjualanPage } from "./admin/RekapPenjualanPage";
 
+// MASTER
+import { MasterDashboardHome } from "./master/MasterDashboardHome";
+import { MasterDashboardLayout } from "./master/MasterDashboardLayout";
+import { AdminManagementPage } from "./master/AdminManagementPage";
+import { KasirManagementPage } from "./master/KasirManagementPage";
+
 // AUTH
 import { UnifiedLoginPage } from "./auth/UnifiedLoginPage";
 
@@ -68,6 +74,10 @@ export default function App() {
               path="/kasir/login"
               element={<UnifiedLoginPage mode="kasir" />}
             />
+            <Route
+              path="/master/login"
+              element={<UnifiedLoginPage mode="master" />}
+            />
 
             {/* ================= KASIR PROTECTED ================= */}
             <Route element={<ProtectedRoute requiredRole="kasir" />}>
@@ -81,6 +91,48 @@ export default function App() {
             <Route element={<ProtectedRoute requiredRole="admin" />}>
               <Route path="/admin" element={<DashboardLayout />}>
                 <Route index element={<DashboardHome />} />
+                <Route path="Galerry" element={<ProductsPage />} />
+                <Route path="Katalog" element={<KatalogPage />} />
+                <Route path="profile" element={<ProfilePage />} />
+                <Route
+                  path="keunggulan-produk"
+                  element={<KeunggulanProduk />}
+                />
+                <Route path="slides" element={<SlidesPage />} />
+                <Route path="MitraPage" element={<MitraPage />} />
+                <Route
+                  path="mitra-management"
+                  element={<MitraManagementPage />}
+                />
+                <Route
+                  path="metode-pembayaran"
+                  element={<MetodePembayaranPage />}
+                />
+                <Route path="arsip-nota" element={<ArsipNotaPage />} />
+                <Route
+                  path="rekap-penjualan"
+                  element={<RekapPenjualanPage />}
+                />
+                <Route
+                  path="password-management"
+                  element={<PasswordManagementPage />}
+                />
+                <Route path="kasir-tempat" element={<KasirTempatPage />} />
+              </Route>
+            </Route>
+
+            {/* ================= MASTER PROTECTED ================= */}
+            <Route element={<ProtectedRoute requiredRole="master" />}>
+              <Route path="/master" element={<MasterDashboardLayout />}>
+                <Route index element={<MasterDashboardHome />} />
+                <Route
+                  path="admin-management"
+                  element={<AdminManagementPage />}
+                />
+                <Route
+                  path="kasir-management"
+                  element={<KasirManagementPage />}
+                />
                 <Route path="Galerry" element={<ProductsPage />} />
                 <Route path="Katalog" element={<KatalogPage />} />
                 <Route path="profile" element={<ProfilePage />} />

@@ -12,7 +12,7 @@ interface Profile {
   id: string;
   username: string;
   email: string;
-  role: "admin" | "kasir";
+  role: "admin" | "kasir" | "master";
   is_active: boolean;
 }
 
@@ -188,40 +188,67 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   ): Promise<Profile> => {
     const cleanUsername = username.trim().toLowerCase();
 
-    const { data: profile, error } = await supabase
-      .from("profiles")
-      .select("id, username, email, role, is_active")
-      .ilike("username", cleanUsername)
-      .maybeSingle();
+    const { data: userData, error: userError } = await supabase.rpc(
+      "get_email_by_username",
+      {
+        input_username: cleanUsername,
+      },
+    );
 
-    if (error) {
-      throw new Error(error.message);
+    if (userError) {
+      console.error("Username lookup error:", userError);
+      throw new Error("Gagal mencari username");
     }
 
-    if (!profile) {
+    if (!userData || userData.length === 0) {
       throw new Error("Username tidak ditemukan");
     }
 
-    if (!profile.is_active) {
+    const foundUser = userData[0];
+
+    if (!foundUser.is_active) {
       throw new Error("Akun tidak aktif");
     }
 
-    const { data, error: loginError } = await supabase.auth.signInWithPassword({
-      email: profile.email,
-      password,
-    });
+    const { data: loginData, error: loginError } =
+      await supabase.auth.signInWithPassword({
+        email: foundUser.email,
+        password,
+      });
 
     if (loginError) {
       throw new Error("Username atau password salah");
     }
 
-    setSession(data.session);
-    setUser(data.user);
-    setProfile(profile as Profile);
+    if (!loginData.user || !loginData.session) {
+      throw new Error("Login gagal");
+    }
 
-    profileCacheRef.current.set(profile.id, profile as Profile);
+    const { data: profileData, error: profileError } = await supabase
+      .from("profiles")
+      .select("id, username, email, role, is_active")
+      .eq("id", loginData.user.id)
+      .single();
 
-    return profile as Profile;
+    if (profileError) {
+      console.error("Profile error:", profileError);
+      throw new Error("Gagal mengambil data profil");
+    }
+
+    if (!profileData.is_active) {
+      await supabase.auth.signOut();
+      throw new Error("Akun tidak aktif");
+    }
+
+    const finalProfile = profileData as Profile;
+
+    setSession(loginData.session);
+    setUser(loginData.user);
+    setProfile(finalProfile);
+
+    profileCacheRef.current.set(finalProfile.id, finalProfile);
+
+    return finalProfile;
   };
 
   const signOut = async (): Promise<void> => {

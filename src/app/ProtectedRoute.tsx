@@ -3,7 +3,7 @@ import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 
 interface ProtectedRouteProps {
-  requiredRole?: "admin" | "kasir";
+  requiredRole?: "admin" | "kasir" | "master";
 }
 
 export default function ProtectedRoute({ requiredRole }: ProtectedRouteProps) {
@@ -30,7 +30,11 @@ export default function ProtectedRoute({ requiredRole }: ProtectedRouteProps) {
     // Jika tidak ada user, redirect ke login sesuai role yang dibutuhkan
     if (!user || !profile) {
       const loginPath =
-        requiredRole === "kasir" ? "/kasir/login" : "/admin/login";
+        requiredRole === "kasir"
+          ? "/kasir/login"
+          : requiredRole === "master"
+            ? "/master/login"
+            : "/admin/login";
       navigate(loginPath, { replace: true });
       return;
     }
@@ -47,8 +51,10 @@ export default function ProtectedRoute({ requiredRole }: ProtectedRouteProps) {
         }
 
         // Redirect ke login page yang sesuai dengan role user
-        const loginPath =
-          profile.role === "kasir" ? "/kasir/login" : "/admin/login";
+        let loginPath = "/admin/login";
+        if (profile.role === "kasir") loginPath = "/kasir/login";
+        else if (profile.role === "master") loginPath = "/master/login";
+
         navigate(loginPath, { replace: true });
       };
 
@@ -58,8 +64,10 @@ export default function ProtectedRoute({ requiredRole }: ProtectedRouteProps) {
 
     // Jika akun tidak aktif, redirect ke login
     if (!profile.is_active) {
-      const loginPath =
-        profile.role === "kasir" ? "/kasir/login" : "/admin/login";
+      let loginPath = "/admin/login";
+      if (profile.role === "kasir") loginPath = "/kasir/login";
+      else if (profile.role === "master") loginPath = "/master/login";
+
       navigate(loginPath, { replace: true });
       return;
     }

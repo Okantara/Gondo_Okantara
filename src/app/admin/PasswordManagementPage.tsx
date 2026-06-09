@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Lock, Eye, EyeOff, AlertCircle, CheckCircle } from "lucide-react";
+import { Lock, AlertCircle, CheckCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 interface UserAccount {
@@ -97,6 +97,7 @@ export function PasswordManagementPage() {
             Authorization: `Bearer ${session.access_token}`,
           },
           body: JSON.stringify({
+            action: "updatePassword",
             userId,
             newPassword,
           }),
@@ -268,13 +269,7 @@ export function PasswordManagementPage() {
                         type="button"
                         onClick={() => togglePasswordVisibility(account.id)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                      >
-                        {showPassword[account.id] ? (
-                          <EyeOff size={18} />
-                        ) : (
-                          <Eye size={18} />
-                        )}
-                      </button>
+                      ></button>
                     </div>
                   </div>
 
@@ -302,13 +297,7 @@ export function PasswordManagementPage() {
                           togglePasswordVisibility(`${account.id}-confirm`)
                         }
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                      >
-                        {showPassword[`${account.id}-confirm`] ? (
-                          <EyeOff size={18} />
-                        ) : (
-                          <Eye size={18} />
-                        )}
-                      </button>
+                      ></button>
                     </div>
                   </div>
 

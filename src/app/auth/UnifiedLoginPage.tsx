@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import LogoPakGondo from "../../assets/Logo_Pak_Gondo.png";
 
 interface UnifiedLoginPageProps {
-  mode: "admin" | "kasir" | "auto";
+  mode: "admin" | "kasir" | "master" | "auto";
 }
 
 export function UnifiedLoginPage({ mode }: UnifiedLoginPageProps) {
@@ -31,12 +31,18 @@ export function UnifiedLoginPage({ mode }: UnifiedLoginPageProps) {
       else if (mode === "kasir" && profile.role === "kasir") {
         navigate("/kasir/order", { replace: true });
       }
+      // Jika mode adalah master dan user adalah master, redirect ke master
+      else if (mode === "master" && profile.role === "master") {
+        navigate("/master", { replace: true });
+      }
       // Jika mode adalah auto, redirect ke dashboard sesuai role
       else if (mode === "auto") {
         if (profile.role === "admin") {
           navigate("/admin", { replace: true });
         } else if (profile.role === "kasir") {
           navigate("/kasir", { replace: true });
+        } else if (profile.role === "master") {
+          navigate("/master", { replace: true });
         }
       }
       // Jika sudah login tapi role tidak sesuai dengan mode, tampilkan pesan
@@ -57,7 +63,9 @@ export function UnifiedLoginPage({ mode }: UnifiedLoginPageProps) {
             ? "admin"
             : mode === "kasir"
               ? "kasir"
-              : profile.role;
+              : mode === "master"
+                ? "master"
+                : profile.role;
 
         if (profile.role !== targetRole) {
           const confirmed = window.confirm(
@@ -93,11 +101,19 @@ export function UnifiedLoginPage({ mode }: UnifiedLoginPageProps) {
         );
       }
 
+      if (mode === "master" && newProfile.role !== "master") {
+        throw new Error(
+          "Akun ini bukan master. Silakan login dengan akun master.",
+        );
+      }
+
       // Redirect berdasarkan role user
       if (newProfile.role === "admin") {
         navigate("/admin", { replace: true });
       } else if (newProfile.role === "kasir") {
         navigate("/kasir", { replace: true });
+      } else if (newProfile.role === "master") {
+        navigate("/master", { replace: true });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login gagal");
@@ -108,28 +124,41 @@ export function UnifiedLoginPage({ mode }: UnifiedLoginPageProps) {
 
   const isAdminMode = mode === "admin";
   const isKasirMode = mode === "kasir";
+  const isMasterMode = mode === "master";
   const bgColor = isAdminMode
     ? "from-blue-50 to-blue-100"
-    : "from-orange-50 to-orange-100";
+    : isMasterMode
+      ? "from-purple-50 to-purple-100"
+      : "from-orange-50 to-orange-100";
   const headerColor = isAdminMode
     ? "from-blue-600 to-blue-700"
-    : "from-orange-600 to-orange-700";
+    : isMasterMode
+      ? "from-purple-600 to-purple-700"
+      : "from-orange-600 to-orange-700";
   const ringColor = isAdminMode
     ? "focus:ring-blue-500"
-    : "focus:ring-orange-500";
+    : isMasterMode
+      ? "focus:ring-purple-500"
+      : "focus:ring-orange-500";
   const buttonColor = isAdminMode
     ? "from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
-    : "from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800";
+    : isMasterMode
+      ? "from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
+      : "from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800";
   const title = isAdminMode
     ? "Login Admin"
-    : isKasirMode
-      ? "Login Kasir"
-      : "Login";
+    : isMasterMode
+      ? "Login Master"
+      : isKasirMode
+        ? "Login Kasir"
+        : "Login";
   const subtitle = isAdminMode
     ? "Silakan login untuk mengakses dashboard admin"
-    : isKasirMode
-      ? ""
-      : "Silakan login untuk melanjutkan";
+    : isMasterMode
+      ? "Silakan login untuk mengakses panel master"
+      : isKasirMode
+        ? ""
+        : "Silakan login untuk melanjutkan";
 
   return (
     <div

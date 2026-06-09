@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { KasirNavbar } from "./KasirNavbar";
 import { Order } from "./Order";
 import { supabase } from "../../lib/supabase";
 import { cetakPDF } from "../../lib/printUtils";
